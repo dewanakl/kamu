@@ -44,7 +44,7 @@
     <div id="main">
         <div class="fof">
             <h1>Kamu</h1>
-            <p>Fast PHP Framework</p>
+            <p><?= $data ?></p>
         </div>
     </div>
 </body>

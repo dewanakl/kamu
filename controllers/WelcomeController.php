@@ -8,6 +8,8 @@ class WelcomeController extends Controller
 {
     public function index()
     {
-        return $this->view('welcome');
+        return $this->view('welcome', [
+            'data' => 'Fast PHP Framework'
+        ]);
     }
 }
