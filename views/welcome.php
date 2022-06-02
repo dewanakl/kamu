@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kamu - Fast PHP Framework</title>
+    <title>Kamu - PHP Framework</title>
     <style>
         html {
             height: 100%;
@@ -29,13 +29,19 @@
         }
 
         .fof h1 {
-            font-size: 50px;
-            display: inline-block;
+            font-size: 40px;
+            display: inline;
         }
 
         .fof p {
-            font-size: 30px;
+            font-size: 20px;
+            margin-left: 5px;
+            display: inline;
+        }
+
+        .fof small {
             display: block;
+            margin-top: 15px;
         }
     </style>
 </head>
@@ -43,8 +49,9 @@
 <body>
     <div id="main">
         <div class="fof">
-            <h1>Kamu</h1>
+            <h1>Kamu |</h1>
             <p><?= $data ?></p>
+            <small>for educational purposes</small>
         </div>
     </div>
 </body>

@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 
 define('startTime', microtime(true));
@@ -9,11 +8,11 @@ require_once 'helpers/helpers.php';
 
 /**
  * Create container this application then
- * Build console object and run it
+ * Make console and run it
  * 
  * it's simple
  */
 $app = \Core\App::new(new \Core\Application());
 
-$console = $app->singleton(\Core\Console::class, array($argv));
+$console = $app->make(\Core\Console::class, array($argv));
 exit($console->run());

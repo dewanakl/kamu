@@ -1,18 +1,16 @@
 <?php
 
 /**
- * Kamu PHP MVC
+ * Kamu PHP Framework
  * for educational purposes
  * 
  * @author dewanakl
  * @see https://github.com/dewanakl/Kamu
  */
 
-define('startTime', microtime(true));
-define('HTTPS', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://');
-
 require_once 'env.php';
 
+define('HTTPS', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://');
 define('BASEURL', @$_ENV['BASEURL'] ? rtrim($_ENV['BASEURL'], '/') : HTTPS . $_SERVER['HTTP_HOST']);
 define('DEBUG', (@$_ENV['DEBUG'] == 'true') ? true : false);
 

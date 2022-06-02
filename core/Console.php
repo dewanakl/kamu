@@ -35,7 +35,7 @@ final class Console
             exit("\033[31m$message\033[37m");
         }
 
-        if (!$options) {
+        if ($options) {
             echo "\n$options\n";
         }
     }

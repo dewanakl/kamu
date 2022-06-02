@@ -6,6 +6,8 @@ use Core\Request;
 use Core\Session;
 use Core\Route;
 
+define('startTime', microtime(true));
+
 require_once __DIR__ . '/../app/app.php';
 
 /** 
