@@ -2,165 +2,89 @@
 
 namespace Core;
 
-use Closure;
-use Middleware\CorsMiddleware;
-use Middleware\CsrftokenMiddleware;
-
-class Route
+/**
+ * Helper class untuk routing url
+ *
+ * @class Route
+ * @package Core
+ */
+final class Route
 {
-    private static array $routes = array();
-    private static string $urinow;
-
-    private static function add(string $method, string $path, array|string $action, array $middlewares): void
+    /**
+     * Simpan url route get
+     *
+     * @param string $path
+     * @param array|string $action
+     * @return Router
+     */
+    public static function get(string $path, array|string $action): Router
     {
-        if (is_array($action)) {
-            $controller = $action[0];
-            $function = $action[1];
-        } else {
-            $controller = null;
-            $function = $action;
-        }
-
-        $path = preg_replace('/{(\w+)}/', '([a-z0-9_]+(?:-[a-z0-9]+)*)', $path);
-
-        array_push(self::$routes, [
-            'method' => $method,
-            'path' => $path,
-            'controller' => $controller,
-            'function' => $function,
-            'middleware' => $middlewares
-        ]);
+        return static::router()->get($path, $action);
     }
 
-    private static function routeNow(): array
+    /**
+     * Simpan url route post
+     *
+     * @param string $path
+     * @param array|string $action
+     * @return Router
+     */
+    public static function post(string $path, array|string $action): Router
     {
-        return self::$routes;
+        return static::router()->post($path, $action);
     }
 
-    private static function invokeMiddleware(Application $app, array $route): void
+    /**
+     * Tambahkan middleware dalam url route
+     *
+     * @param array|string $middlewares
+     * @return Router
+     */
+    public static function middleware(array|string $middlewares): Router
     {
-        $middlewarePool = [];
-
-        $middlewarePool[] = $app->singleton(CorsMiddleware::class);
-        $middlewarePool[] = $app->singleton(CsrftokenMiddleware::class);
-
-        foreach ($route['middleware'] as $middleware) {
-            $middlewarePool[] = $app->singleton($middleware);
-        }
-
-        $app->singleton(Middleware::class)->layer($middlewarePool)
-            ->handle($app->singleton(Request::class), fn ($request) => $request);
+        return static::router()->middleware($middlewares);
     }
 
-    private static function invokeController(Application $app, array $route, array $variables): void
+    /**
+     * Tambahkan url lagi dalam route
+     *
+     * @param string $prefix
+     * @return Router
+     */
+    public static function prefix(string $prefix): Router
     {
-        $controller = $route['controller'];
-        $method = $route['function'];
-        array_shift($variables);
-
-        $result = $app->invoke($controller, $method, $variables);
-
-        if (is_string($result) || $result instanceof Render) {
-            $app->singleton(Session::class)->set('oldRoute', self::$urinow);
-            $app->singleton(Session::class)->unset('old');
-            $app->singleton(Session::class)->unset('error');
-
-            echo $result;
-        }
-
-        exit;
+        return static::router()->prefix($prefix);
     }
 
-    public static function get(string $path, array|string $action, array $middlewares = []): void
+    /**
+     * Tambahkan controller dalam route
+     *
+     * @param string $name
+     * @return Router
+     */
+    public static function controller(string $name): Router
     {
-        static::add('GET', $path, $action, $middlewares);
+        return static::router()->controller($name);
     }
 
-    public static function post(string $path, array|string $action, array $middlewares = []): void
+    /**
+     * Ambil url dalam route dengan nama
+     *
+     * @param string $name
+     * @return string
+     */
+    public static function getPath(string $name): string
     {
-        static::add('POST', $path, $action, $middlewares);
+        return static::router()->getPath($name);
     }
 
-    public static function middleware(array|string $middlewares, Closure $next): void
+    /**
+     * Ambil objek router
+     *
+     * @return Router
+     */
+    public static function router(): Router
     {
-        if (!is_array($middlewares)) {
-            $middlewares = array($middlewares);
-        }
-
-        $routes = static::routeNow();
-        $next();
-
-        foreach (static::routeNow() as $route) {
-            if (!in_array($route, $routes)) {
-                $id = array_search($route, self::$routes);
-                foreach (array_reverse($middlewares) as $middleware) {
-                    array_unshift(self::$routes[$id]['middleware'], $middleware);
-                }
-            }
-        }
-    }
-
-    public static function prefix(string $prefix, Closure $next): void
-    {
-        $routes = static::routeNow();
-        $next();
-
-        foreach (static::routeNow() as $route) {
-            if (!in_array($route, $routes)) {
-                $id = array_search($route, self::$routes);
-                $old = self::$routes[$id]['path'];
-
-                $prefix = preg_replace('/{(\w+)}/', '([a-z0-9_]+(?:-[a-z0-9]+)*)', $prefix);
-                $result = ($old != '/') ? $prefix . $old : $prefix;
-                self::$routes[$id]['path'] = $result;
-            }
-        }
-    }
-
-    public static function controller(string $name, Closure $next): void
-    {
-        $routes = static::routeNow();
-        $next();
-
-        foreach (static::routeNow() as $route) {
-            if (!in_array($route, $routes)) {
-                $id = array_search($route, self::$routes);
-                $old = self::$routes[$id]['controller'];
-
-                $result = is_null($old) ? $name : $old;
-                self::$routes[$id]['controller'] = $result;
-            }
-        }
-    }
-
-    public static function run(Application $app, string $path = '/'): void
-    {
-        $request = $app->singleton(Request::class);
-
-        $method = $request->method();
-        $path = $request->server('PATH_INFO') ?? $path;
-
-        $isRouteMatch = false;
-        $isMethodMatch = false;
-
-        foreach (static::routeNow() as $route) {
-            $pattern = '#^' . $route['path'] . '$#';
-            if (preg_match($pattern, $path, $variables)) {
-                $isRouteMatch = true;
-                if ($method == $route['method']) {
-                    $isMethodMatch = true;
-                    self::$urinow = $request->server('REQUEST_URI');
-
-                    static::invokeMiddleware($app, $route);
-                    static::invokeController($app, $route, $variables);
-                }
-            }
-        }
-
-        if ($isRouteMatch && !$isMethodMatch) {
-            notAllowed();
-        } else {
-            notFound();
-        }
+        return Router::self();
     }
 }

@@ -4,27 +4,72 @@ namespace Core;
 
 use InvalidArgumentException;
 
+/**
+ * Tampilkan html dan juga injek variabel
+ *
+ * @class Render
+ * @package Core
+ */
 class Render
 {
-    private $path;
-    private $content;
-    private $variables;
+    /**
+     * Path file html
+     * 
+     * @var string $path
+     */
+    private string $path;
 
+    /**
+     * Isi file html
+     * 
+     * @var string $path
+     */
+    private string $content;
+
+    /**
+     * Injek variabel
+     * 
+     * @var array $variables
+     */
+    private array $variables;
+
+    /**
+     * Init objek
+     * 
+     * @param string $path
+     * @return void
+     */
     function __construct(string $path)
     {
         $this->path = $path;
     }
 
+    /**
+     * Magic to string
+     * 
+     * @return string
+     */
     function __toString()
     {
         return $this->content;
     }
 
+    /**
+     * Set variabel ke template html
+     * 
+     * @param array $variables
+     * @return void
+     */
     public function setData(array $variables = []): void
     {
         $this->variables = $variables;
     }
 
+    /**
+     * Eksekusi template html
+     * 
+     * @return void
+     */
     public function show(): void
     {
         $path = __DIR__ . '/../views/' . $this->path . '.php';

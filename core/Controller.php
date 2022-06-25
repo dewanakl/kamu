@@ -2,36 +2,56 @@
 
 namespace Core;
 
+/**
+ * Base controller untuk mempermudah 
+ *
+ * @class Controller
+ * @package Core
+ */
 abstract class Controller
 {
+    /**
+     * Render template html
+     *
+     * @param string $view
+     * @param array $param
+     * @return Render
+     */
     protected function view(string $view, array $param = []): Render
     {
-        $template = new Render($view);
-        $template->setData($param);
-        $template->show();
-
-        return $template;
+        return App::get()->singleton(Respond::class)->view($view, $param);
     }
 
-    protected function flash(string $key, string $value): Controller
+    /**
+     * Alihkan ke url
+     *
+     * @param string $prm
+     * @return Respond
+     */
+    protected function redirect(string $prm): Respond
     {
-        session()->set($key, $value);
-        return $this;
+        return App::get()->singleton(Respond::class)->to($prm);
     }
 
-    protected function to(string $redirect): void
+    /**
+     * Kembali seperti semula
+     *
+     * @return Respond
+     */
+    protected function back(): Respond
     {
-        response($redirect);
+        return App::get()->singleton(Respond::class)->back();
     }
 
+    /**
+     * Ubah ke json
+     *
+     * @param array $data
+     * @param int $statusCode
+     * @return Respond
+     */
     protected function json(array $data, int $statusCode = 200): string|false
     {
-        http_response_code($statusCode);
-        return resJson($data);
-    }
-
-    protected function back(): void
-    {
-        $this->to(session()->get('oldRoute', '/'));
+        return App::get()->singleton(Respond::class)->json($data, $statusCode);
     }
 }

@@ -12,7 +12,6 @@ interface MiddlewareInterface
      *
      * @param Request $request
      * @param Closure $next
-     *
      * @return Closure
      */
     public function handle(Request $request, Closure $next);

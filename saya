@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 define('startTime', microtime(true));
@@ -12,6 +13,7 @@ require_once 'helpers/helpers.php';
  * 
  * it's simple
  */
+
 $app = \Core\App::new(new \Core\Application());
 
 $console = $app->make(\Core\Console::class, array($argv));

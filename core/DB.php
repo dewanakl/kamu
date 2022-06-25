@@ -20,7 +20,7 @@ class DB
         return new self;
     }
 
-    public function get()
+    public function all()
     {
         if (empty($this->query)) {
             $this->query = "SELECT * FROM " . self::$table;

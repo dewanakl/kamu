@@ -12,6 +12,8 @@ class DataBase
     private $stmt;
     private $transaction;
 
+    private $query;
+
     function __construct()
     {
         $dsn = sprintf(
@@ -31,7 +33,7 @@ class DataBase
             $this->dbh = new PDO($dsn, env('DB_USER'), env('DB_PASS'), $option);
         } catch (PDOException $e) {
             if (DEBUG) {
-                throw new Exception($e->getMessage());
+                throw new Exception($e->getMessage() . ' (SQL:' . $this->query . ')');
             }
             return unavailable();
         }
@@ -40,20 +42,21 @@ class DataBase
     public function exec(string $command)
     {
         try {
-            $this->dbh->beginTransaction();
+            //$this->dbh->beginTransaction();
             $result = $this->dbh->exec($command);
-            $this->dbh->commit();
+            //$this->dbh->commit();
 
             return $result;
         } catch (PDOException $e) {
-            $this->dbh->rollBack();
+            //$this->dbh->rollBack();
             throw new Exception($e->getMessage());
         }
     }
 
     public function query(string $query): void
     {
-        $this->stmt = $this->dbh->prepare($query);
+        $this->query = $query;
+        $this->stmt = $this->dbh->prepare($this->query);
     }
 
     public function bind($param, $value, $type = null): void
@@ -98,7 +101,7 @@ class DataBase
             }
 
             if (DEBUG) {
-                throw new Exception($e->getMessage());
+                throw new Exception($e->getMessage() . ' (SQL: ' . $this->stmt->queryString . ')');
             }
             return false;
         }

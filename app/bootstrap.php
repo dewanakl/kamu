@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Daftarkan file class secara otomatis
+ * agar tidak ribet
+ */
+
 spl_autoload_register(function (string $name) {
     $name = str_replace('\\', '/', $name);
     $classPath = dirname(__DIR__) . '/' . lcfirst($name) . '.php';

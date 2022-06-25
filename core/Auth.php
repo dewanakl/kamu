@@ -40,14 +40,14 @@ class Auth
         if ($credential && password_verify($password, $credential->password)) {
             session()->set('user', $credential);
             return true;
-        } else {
-            session()->set('old', [
-                'email' => $email
-            ]);
-            session()->set('error', [
-                'email' => 'Email atau password salah !'
-            ]);
-            return false;
         }
+
+        session()->set('old', [
+            'email' => $email
+        ]);
+        session()->set('error', [
+            'email' => 'Email atau password salah !'
+        ]);
+        return false;
     }
 }

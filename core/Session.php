@@ -2,8 +2,19 @@
 
 namespace Core;
 
+/**
+ * Class untuk menghandle session
+ *
+ * @class Session
+ * @package Core
+ */
 class Session
 {
+    /**
+     * Buat objek session
+     *
+     * @return void
+     */
     function __construct()
     {
         if (!session_id()) {
@@ -15,7 +26,14 @@ class Session
         }
     }
 
-    public function get($name = null, $defaultValue = null): mixed
+    /**
+     * Ambil nilai dari sesi ini
+     *
+     * @param string $name
+     * @param mixed $defaultValue
+     * @return mixed
+     */
+    public function get(string $name = null, mixed $defaultValue = null): mixed
     {
         if ($name === null) {
             return $_SESSION;
@@ -24,22 +42,47 @@ class Session
         return $this->__get($name) ?? $defaultValue;
     }
 
-    public function set($name, $value): void
+    /**
+     * Isi nilai ke sesi ini
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return void
+     */
+    public function set(string $name, mixed $value): void
     {
         $_SESSION[$name] = $value;
     }
 
-    public function unset($name)
+    /**
+     * Hapus nilai dari sesi ini
+     *
+     * @param string $name
+     * @return void
+     */
+    public function unset(string $name): void
     {
         unset($_SESSION[$name]);
     }
 
-    public function __get($name)
+    /**
+     * Ambil nilai dari sesi ini
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function __get(string $name): mixed
     {
         return $this->__isset($name) ? $_SESSION[$name] : null;
     }
 
-    public function __isset($name)
+    /**
+     * Cek nilai dari sesi ini
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function __isset(string $name): bool
     {
         return isset($_SESSION[$name]);
     }

@@ -30,6 +30,6 @@ require_once 'bootstrap.php';
 require_once __DIR__ . '/../routes/routes.php';
 require_once __DIR__ . '/../helpers/helpers.php';
 
-set_exception_handler(fn ($exception) => view('errors/trace', [
-    'error' => $exception
+set_exception_handler(fn ($error) => show('errors/trace', [
+    'error' => $error
 ]));

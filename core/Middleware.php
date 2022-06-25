@@ -3,52 +3,58 @@
 namespace Core;
 
 use Closure;
-use InvalidArgumentException;
-use Middleware\MiddlewareInterface;
 
+/**
+ * Middleware - cek dahulu sebelum ke controller
+ *
+ * @class Middleware
+ * @package Core
+ */
 class Middleware
 {
+    /**
+     * Kumpulan objek middleware ada disini
+     * 
+     * @var array $layers
+     */
     private $layers;
 
+    /**
+     * Buat objek middleware
+     *
+     * @param array $layers
+     * @return void
+     */
     function __construct(array $layers = [])
     {
-        $this->layers = $layers;
+        $this->layers = array_reverse($layers);
     }
 
-    public function layer(array $layers): Middleware
+    /**
+     * Handle semua dari layer middleware
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function handle(Request $request): void
     {
-        if ($layers instanceof MiddlewareInterface) {
-            $layers = [$layers];
-        }
+        $completeOnion = array_reduce(
+            $this->layers,
+            fn ($nextLayer, $layer) => $this->createLayer($nextLayer, $layer),
+            fn ($next) => $next
+        );
 
-        if (!is_array($layers)) {
-            throw new InvalidArgumentException(get_class($layers) . " is not a middleware.");
-        }
-
-        return new static(array_merge($this->layers, $layers));
+        $completeOnion($request);
     }
 
-    public function handle(Request $request, Closure $core): mixed
-    {
-        $coreFunction = $this->createCoreFunction($core);
-
-        $layers = array_reverse($this->layers);
-
-        $completeOnion = array_reduce($layers, function ($nextLayer, $layer) {
-            return $this->createLayer($nextLayer, $layer);
-        }, $coreFunction);
-
-        return $completeOnion($request);
-    }
-
-    private function createCoreFunction(Closure $core): Closure
-    {
-        return function ($request) use ($core) {
-            return $core($request);
-        };
-    }
-
-    private function createLayer($nextLayer, $layer): Closure
+    /**
+     * Buat lapisan perlayer untuk eksekusi
+     *
+     * @param mixed $nextLayer
+     * @param mixed $layer
+     * @return Closure
+     */
+    private function createLayer(mixed $nextLayer, mixed $layer): Closure
     {
         return function ($request) use ($nextLayer, $layer) {
             return $layer->handle($request, $nextLayer);

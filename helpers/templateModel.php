@@ -1,4 +1,12 @@
-<?php return '<?php
+<?php
+
+/**
+ * Template untuk membuat file model dengan saya console
+ * 
+ * @return string
+ */
+
+return '<?php
 
 namespace Models;
 

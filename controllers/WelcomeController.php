@@ -6,7 +6,7 @@ use Core\Controller;
 
 class WelcomeController extends Controller
 {
-    public function index()
+    function __invoke()
     {
         return $this->view('welcome', [
             'data' => 'PHP Framework'

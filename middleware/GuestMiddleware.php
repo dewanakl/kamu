@@ -10,7 +10,7 @@ final class GuestMiddleware implements MiddlewareInterface
     public function handle(Request $request, Closure $next)
     {
         if (auth()->check()) {
-            response('/');
+            respond()->redirect('/');
         }
 
         return $next($request);

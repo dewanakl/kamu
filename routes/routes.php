@@ -5,7 +5,7 @@ use Core\Route;
 
 /**
  * Make something great with this app
- * keep simple yahh
+ * tetap sederhana yahh
  */
 
-Route::get('/', [WelcomeController::class, 'index']);
+Route::get('/', WelcomeController::class);

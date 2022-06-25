@@ -6,7 +6,7 @@ use Core\Table;
 return new class
 {
     /**
-     * Jalankan migrasi.
+     * Jalankan migrasi
      *
      * @return void
      */
@@ -23,7 +23,7 @@ return new class
     }
 
     /**
-     * Kembalikan seperti semula.
+     * Kembalikan seperti semula
      *
      * @return void
      */

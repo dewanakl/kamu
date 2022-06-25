@@ -37,7 +37,7 @@ class Request
         }
         session()->set('error', $errors);
 
-        response(session()->get('oldRoute', '/'));
+        respond()->redirect(session()->get('oldRoute', '/'));
     }
 
     /**

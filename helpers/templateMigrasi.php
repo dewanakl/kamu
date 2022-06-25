@@ -1,4 +1,12 @@
-<?php return '<?php
+<?php
+
+/**
+ * Template untuk membuat file migrasi dengan saya console
+ * 
+ * @return string
+ */
+
+return '<?php
 
 use Core\Schema;
 use Core\Table;
@@ -6,7 +14,7 @@ use Core\Table;
 return new class
 {
     /**
-     * Jalankan migrasi.
+     * Jalankan migrasi
      *
      * @return void
      */
@@ -20,7 +28,7 @@ return new class
     }
 
     /**
-     * Kembalikan seperti semula.
+     * Kembalikan seperti semula
      *
      * @return void
      */

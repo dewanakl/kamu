@@ -10,7 +10,7 @@ final class AuthMiddleware implements MiddlewareInterface
     public function handle(Request $request, Closure $next)
     {
         if (!auth()->check()) {
-            response('/login');
+            respond()->redirect('/login');
         }
 
         return $next($request);

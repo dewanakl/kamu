@@ -5,7 +5,7 @@ use Models\User;
 return new class
 {
     /**
-     * Generate nilai database.
+     * Generate nilai pada database
      *
      * @return void
      */

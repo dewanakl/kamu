@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Baca file .env
+ * kemudian masukan kedalam global var ENV
+ */
+
 $path = __DIR__ . '/../.env';
 
 $lines = @file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

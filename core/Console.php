@@ -2,17 +2,68 @@
 
 namespace Core;
 
+/**
+ * Saya console untuk mempermudah develop app
+ *
+ * @class Console
+ * @package Core
+ */
 final class Console
 {
-    private $command;
+    /**
+     * Perintah untuk eksekusi
+     * 
+     * @var string|null $command
+     */
+    private string|null $command;
+
+    /**
+     * Perintah untuk eksekusi
+     * 
+     * @var string $command
+     */
     private $options;
+
+    /**
+     * Waktu yang dibutuhkan
+     * 
+     * @var int $timenow
+     */
     private $timenow;
 
+    /**
+     * Text warna hijau
+     * 
+     * @var string $green
+     */
     private $green = "\033[32m";
+
+    /**
+     * Text warna kuning
+     * 
+     * @var string $yellow
+     */
     private $yellow = "\033[33m";
+
+    /**
+     * Text warna biru muda
+     * 
+     * @var string $cyan
+     */
     private $cyan = "\033[36m";
+
+    /**
+     * Text warna semula
+     * 
+     * @var string $normal
+     */
     private $normal = "\033[37m";
 
+    /**
+     * Buat objek session
+     *
+     * @return void
+     */
     function __construct($argv)
     {
         if (PHP_MAJOR_VERSION < 8) {
@@ -29,6 +80,14 @@ final class Console
         print($this->normal);
     }
 
+    /**
+     * Tampilkan pesan khusus error
+     *
+     * @param string $message
+     * @param bool $fail
+     * @param ?string $options
+     * @return void
+     */
     private function exception(string $message, bool $fail = true, ?string $options = null): void
     {
         if ($fail) {
@@ -40,6 +99,11 @@ final class Console
         }
     }
 
+    /**
+     * Kalkulasi waktu yang dibutuhkan
+     *
+     * @return string
+     */
     private function executeTime(): string
     {
         $result = '(' . floor(number_format(microtime(true) - $this->timenow, 3, '')) . ' ms)';
@@ -47,6 +111,12 @@ final class Console
         return $this->cyan . $result . $this->normal;
     }
 
+    /**
+     * Migrasi ke database
+     *
+     * @param bool $up
+     * @return void
+     */
     private function migrasi(bool $up = true): void
     {
         $baseFile = __DIR__ . '/../database/schema/';
@@ -62,6 +132,11 @@ final class Console
         }
     }
 
+    /**
+     * Isi nilai ke database
+     *
+     * @return void
+     */
     private function generator(): void
     {
         $arg = include __DIR__ . '/../database/generator.php';
@@ -69,6 +144,12 @@ final class Console
         print("\nGenerator" . $this->green . " berhasil " . $this->normal . $this->executeTime());
     }
 
+    /**
+     * Buat file migrasi
+     *
+     * @param ?string $name
+     * @return void
+     */
     private function createMigrasi(?string $name): void
     {
         $this->exception('Butuh Nama file !', !$name);
@@ -78,6 +159,12 @@ final class Console
         $this->exception('Gagal membuat migrasi', !$result, 'Berhasil membuat migrasi');
     }
 
+    /**
+     * Buat file middleware
+     *
+     * @param ?string $name
+     * @return void
+     */
     private function createMiddleware(?string $name): void
     {
         $this->exception('Butuh Nama file !', !$name);
@@ -87,6 +174,12 @@ final class Console
         $this->exception('Gagal membuat middleware', !$result, 'Berhasil membuat middleware');
     }
 
+    /**
+     * Buat file controller
+     *
+     * @param ?string $name
+     * @return void
+     */
     private function createController(?string $name): void
     {
         $this->exception('Butuh Nama file !', !$name);
@@ -96,6 +189,12 @@ final class Console
         $this->exception('Gagal membuat controller', !$result, 'Berhasil membuat controller');
     }
 
+    /**
+     * Buat file model
+     *
+     * @param ?string $name
+     * @return void
+     */
     private function createModel(?string $name): void
     {
         $this->exception('Butuh Nama file !', !$name);
@@ -106,6 +205,11 @@ final class Console
         $this->exception('Gagal membuat model', !$result, 'Berhasil membuat model');
     }
 
+    /**
+     * Tampilkan list menu yang ada
+     *
+     * @return void
+     */
     private function listMenu(): void
     {
         $menus = [
@@ -146,19 +250,26 @@ final class Console
                 'description' => 'bikin file model [nama file]'
             ],
         ];
+
         print("Penggunaan:\n perintah [options]\n\n");
         $mask = $this->cyan . "%-20s" . $this->normal . " %-30s\n";
+
         foreach ($menus as $value) {
             printf($mask, $value['command'], $value['description']);
         }
     }
 
-    public function run(): void
+    /**
+     * Jalankan console
+     *
+     * @return int
+     */
+    public function run(): int
     {
         switch ($this->command) {
             case 'coba':
                 $location = ($this->options) ? $this->options : 'localhost';
-                echo shell_exec("php -S $location:8000 -t public");
+                shell_exec("php -S $location:8000 -t public");
                 break;
             case 'migrasi':
                 $this->migrasi();
@@ -195,5 +306,7 @@ final class Console
                 $this->listMenu();
                 break;
         }
+
+        return 0;
     }
 }

@@ -26,7 +26,7 @@
 
 <body>
     <div style="display: grid;">
-        <h1><?= $error->getMessage() ?></h1>
+        <h2><?= $error->getMessage() ?></h2>
         <p><?= $error->getFile() . '::' . $error->getLine() ?></p>
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse;">
@@ -34,16 +34,14 @@
                     <th>No</th>
                     <th>File</th>
                     <th>Line</th>
-                    <th>Function</th>
-                    <th>Class</th>
+                    <th>Action</th>
                 </tr>
                 <?php foreach ($error->getTrace() as $key => $value) : ?>
                     <tr>
                         <td><?= $key + 1 ?></td>
                         <td><?= $value['file'] ?? '-' ?></td>
                         <td><?= $value['line'] ?? '-' ?></td>
-                        <td><?= $value['function'] ?? '-' ?></td>
-                        <td><?= $value['class'] ?? '-' ?></td>
+                        <td><?= @$value['class'] ? $value['class'] . $value['type'] . $value['function'] : $value['function'] ?></td>
                     </tr>
                 <?php endforeach ?>
             </table>

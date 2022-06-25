@@ -2,12 +2,21 @@
 
 namespace Core;
 
+use ArrayAccess;
+use ArrayIterator;
+use Iterator;
+use IteratorAggregate;
 use ReflectionClass;
+use ReflectionProperty;
+use ReturnTypeWillChange;
+use Traversable;
 
-class Model
+class Model implements IteratorAggregate
 {
     private static $query;
     private static $param;
+
+    public $attributes = [];
 
     protected static $db;
     protected $database;
@@ -18,6 +27,32 @@ class Model
             self::$db = App::get()->singleton(DataBase::class);
             $this->database = self::$db;
         }
+    }
+
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->attributes);
+    }
+
+
+    #[\ReturnTypeWillChange]
+    public function current()
+    {
+        var_dump(__METHOD__);
+        return $this->array[$this->position];
+    }
+
+    #[ReturnTypeWillChange]
+    public function key()
+    {
+        var_dump(__METHOD__);
+        return $this->position;
+    }
+
+    public function next(): void
+    {
+        var_dump(__METHOD__);
+        ++$this->position;
     }
 
     private static function getPropertyChild(string $prop): mixed
@@ -77,7 +112,28 @@ class Model
 
         self::$query = $query;
         self::$param = [];
+
         return new self;
+    }
+
+    public function setAtt()
+    {
+        $data = static::raw(self::$query, self::$param);
+        foreach ($data as $key => $value) {
+            $this->attributes[] = $value;
+        }
+
+        // $refl = new ReflectionClass($this);
+
+        // foreach ($data as $propertyToSet => $value) {
+        //     $property = $refl->getProperty((string)$propertyToSet);
+
+        //     if ($property instanceof ReflectionProperty) {
+        //         $property->setValue($this, $value);
+        //     }
+        // }
+
+        return $this;
     }
 
     public static function where(string $column, mixed $value, string $statment = '=', string $agr = 'AND'): Model
@@ -177,5 +233,55 @@ class Model
             true,
             true
         );
+    }
+
+    /**
+     * @param $name
+     * @return bool|int|mixed|string|null
+     * @throws Exception
+     */
+    public function __get($name)
+    {
+        $getter = $this->getFunctionName($name, 'get');
+        if ($this->__isset($name) && !in_array($name, $this->dates)) {
+            if (method_exists($this, $getter)) {
+                return $this->callMethod($this, $getter);
+            }
+
+            return $this->attributes[$name];
+        }
+
+        return null;
+    }
+
+    /**
+     * @param $name
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        return isset($this->attributes[$name]);
+    }
+
+    /**
+     * @param $instance
+     * @param $method
+     *
+     * @return bool|mixed
+     */
+    protected function callMethod($instance, $method)
+    {
+        return (method_exists($instance, $method)) ? call_user_func([$instance, $method]) : false;
+    }
+
+    /**
+     * @param $name
+     * @param string $prefix
+     *
+     * @return string
+     */
+    protected function getFunctionName($name, string $prefix = 'get'): string
+    {
+        return $prefix . ucwords(str_replace('_', '', $name));
     }
 }
