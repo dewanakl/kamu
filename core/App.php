@@ -15,7 +15,7 @@ final class App
      * 
      * @var Application $app
      */
-    private static Application $app;
+    private static $app;
 
     /**
      * Bikin objek untuk pertama kalinya

@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-define('startTime', microtime(true));
+define('START_TIME', microtime(true));
 
 require_once 'app/env.php';
 require_once 'app/bootstrap.php';

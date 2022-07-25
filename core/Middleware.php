@@ -9,6 +9,7 @@ use Closure;
  *
  * @class Middleware
  * @package Core
+ * @see https://github.com/esbenp/onion
  */
 class Middleware
 {

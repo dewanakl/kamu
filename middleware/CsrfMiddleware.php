@@ -9,7 +9,7 @@ final class CsrfMiddleware implements MiddlewareInterface
 {
     public function handle(Request $request, Closure $next)
     {
-        if ($request->method() == 'POST' && (!$request->ajax())) {
+        if ($request->method() != 'GET' && (!$request->ajax())) {
             $this->checkToken($request->get('_token', ''));
         }
 
@@ -36,7 +36,7 @@ final class CsrfMiddleware implements MiddlewareInterface
             if (!$ajax) {
                 pageExpired();
             } else {
-                respond()->terminate(respond()->json((['token' => 'false'])));
+                respond()->terminate(respond()->json(['token' => false], 400));
             }
         }
 

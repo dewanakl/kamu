@@ -15,5 +15,10 @@ use Core\Model;
 final class NAME extends Model
 {
     protected $table = \'NAMe\';
+
+    protected $dates = [
+        \'created_at\',
+        \'updated_at\',
+    ];
 }
 ';

@@ -2,31 +2,34 @@
 
 namespace Core;
 
-class DB
+/**
+ * Helper class DB untuk custome nama table
+ *
+ * @class DB
+ * @package Core
+ */
+final class DB
 {
-    private static $table;
-    private $query;
-    private $param;
+    /**
+     * Simpan jadi objek tunggal
+     * 
+     * @var BaseModel $base
+     */
+    private static $base;
 
-    protected static $db;
-
-    public static function table(string $name)
+    /**
+     * Nama tabelnya apah ?
+     *
+     * @param string $name
+     * @return BaseModel
+     */
+    public static function table(string $name): BaseModel
     {
-        if (!self::$db instanceof DataBase) {
-            self::$db = App::get()->singleton(DataBase::class);
-        }
-        self::$table = $name;
-
-        return new self;
-    }
-
-    public function all()
-    {
-        if (empty($this->query)) {
-            $this->query = "SELECT * FROM " . self::$table;
+        if (!(self::$base instanceof BaseModel)) {
+            self::$base = App::get()->singleton(BaseModel::class);
         }
 
-        self::$db->query($this->query);
-        return self::$db->getAll();
+        self::$base->table($name);
+        return self::$base;
     }
 }

@@ -125,7 +125,7 @@ class Table
     public function integer(string $name): self
     {
         if ($this->type == 'pgsql') {
-            $this->query[] = "$name bigint NOT NULL";
+            $this->query[] = "$name BIGINT NOT NULL";
         } else {
             $this->query[] = "$name INTEGER(11) NOT NULL";
         }
@@ -154,27 +154,27 @@ class Table
     public function dateTime(string $name): self
     {
         if ($this->type == 'pgsql') {
-            $this->query[] = "$name timestamp without time zone NOT NULL";
+            $this->query[] = "$name TIMESTAMP WITHOUT TIME ZONE NOT NULL";
         } else {
-            $this->query[] = "$name datetime NOT NULL";
+            $this->query[] = "$name DATETIME NOT NULL";
         }
 
         return $this;
     }
 
     /**
-     * Create_at and update_at
+     * created_at and updated_at
      * 
      * @return void
      */
     public function timeStamp(): void
     {
         if ($this->type == 'pgsql') {
-            $this->query[] = "create_at timestamp without time zone NOT NULL DEFAULT NOW()";
-            $this->query[] = "update_at timestamp without time zone NOT NULL DEFAULT NOW()";
+            $this->query[] = "created_at TIMESTAMP WITHOUT TIME ZONE NULL";
+            $this->query[] = "updated_at TIMESTAMP WITHOUT TIME ZONE NULL";
         } else {
-            $this->query[] = "create_at datetime NOT NULL DEFAULT NOW()";
-            $this->query[] = "update_at datetime NOT NULL DEFAULT NOW()";
+            $this->query[] = "created_at DATETIME NULL";
+            $this->query[] = "updated_at DATETIME NULL";
         }
     }
 
@@ -197,11 +197,7 @@ class Table
      */
     public function default(string|int $name): void
     {
-        if (is_string($name)) {
-            $constraint = " DEFAULT '$name'";
-        } else {
-            $constraint = " DEFAULT $name";
-        }
+        $constraint = is_string($name) ? " DEFAULT '$name'" : " DEFAULT $name";
 
         $this->query[$this->getLastArray()] = end($this->query) . $constraint;
     }
@@ -224,7 +220,7 @@ class Table
      */
     public function foreign(string $name): self
     {
-        $this->query[] = "CONSTRAINT FK_$name FOREIGN KEY($name)";
+        $this->query[] = "CONSTRAINT FK_{$this->table}_$name FOREIGN KEY($name)";
         return $this;
     }
 

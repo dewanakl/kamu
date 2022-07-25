@@ -3,7 +3,7 @@
 namespace Core;
 
 /**
- * Base controller untuk mempermudah 
+ * Base controller untuk mempermudah memanggil fungsi
  *
  * @class Controller
  * @package Core
@@ -19,7 +19,7 @@ abstract class Controller
      */
     protected function view(string $view, array $param = []): Render
     {
-        return App::get()->singleton(Respond::class)->view($view, $param);
+        return app(Respond::class)->view($view, $param);
     }
 
     /**
@@ -30,7 +30,7 @@ abstract class Controller
      */
     protected function redirect(string $prm): Respond
     {
-        return App::get()->singleton(Respond::class)->to($prm);
+        return app(Respond::class)->to($prm);
     }
 
     /**
@@ -40,18 +40,18 @@ abstract class Controller
      */
     protected function back(): Respond
     {
-        return App::get()->singleton(Respond::class)->back();
+        return app(Respond::class)->back();
     }
 
     /**
      * Ubah ke json
      *
-     * @param array $data
+     * @param mixed $data
      * @param int $statusCode
-     * @return Respond
+     * @return string|false
      */
-    protected function json(array $data, int $statusCode = 200): string|false
+    protected function json(mixed $data, int $statusCode = 200): string|false
     {
-        return App::get()->singleton(Respond::class)->json($data, $statusCode);
+        return app(Respond::class)->json($data, $statusCode);
     }
 }

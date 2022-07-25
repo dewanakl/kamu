@@ -20,14 +20,21 @@ class Service
      * 
      * @var Request $request
      */
-    private Request $request;
+    private $request;
 
     /**
      * Objek respond disini
      * 
      * @var Respond $respond
      */
-    private Respond $respond;
+    private $respond;
+
+    /**
+     * Objek app disini
+     * 
+     * @var Application $app
+     */
+    private $app;
 
     /**
      * Buat objek service
@@ -40,6 +47,7 @@ class Service
     {
         $this->request = $request;
         $this->respond = $respond;
+        $this->app = App::get();
     }
 
     /**
@@ -47,26 +55,27 @@ class Service
      *
      * @param array $route
      * @return void
+     * 
+     * @throws InvalidArgumentException
      */
     private function invokeMiddleware(array $route): void
     {
-        $app = App::get();
         $middlewarePool = [];
 
-        $middlewarePool[] = $app->make(CorsMiddleware::class);
-        $middlewarePool[] = $app->make(CsrfMiddleware::class);
+        $middlewarePool[] = $this->app->make(CorsMiddleware::class);
+        $middlewarePool[] = $this->app->make(CsrfMiddleware::class);
 
         foreach ($route['middleware'] as $middleware) {
-            $layer = $app->make($middleware);
+            $layer = $this->app->make($middleware);
 
-            if (!$layer instanceof MiddlewareInterface) {
+            if (!($layer instanceof MiddlewareInterface)) {
                 throw new InvalidArgumentException(get_class($layer) . ' bukan middleware');
             }
 
             $middlewarePool[] = $layer;
         }
 
-        $middleware = $app->make(Middleware::class, array($middlewarePool));
+        $middleware = $this->app->make(Middleware::class, array($middlewarePool));
         $middleware->handle($this->request);
     }
 
@@ -83,20 +92,52 @@ class Service
         $method = $route['function'];
         array_shift($variables);
 
-        $this->respond->send(App::get()->invoke($controller, $method, $variables));
+        if (is_null($controller)) {
+            $controller = $method;
+            $method = '__invoke';
+        }
+
+        $this->respond->send($this->app->invoke($controller, $method, $variables));
+    }
+
+    /**
+     * Routenya salah atau methodnya
+     *
+     * @param bool $route
+     * @param bool $method
+     * @return void
+     */
+    private function outOfRoute(bool $route, bool $method): void
+    {
+        if ($route && !$method) {
+            if ($this->request->ajax()) {
+                $this->respond->terminate($this->respond->json([
+                    'error' => 'Method Not Allowed 405'
+                ], 405));
+            }
+
+            notAllowed();
+        } else if (!$route) {
+            if ($this->request->ajax()) {
+                $this->respond->terminate($this->respond->json([
+                    'error' => 'Not Found 404'
+                ], 404));
+            }
+
+            notFound();
+        }
     }
 
     /**
      * Jalankan servicenya
      *
      * @param Router $router
-     * @param string $path
      * @return void
      */
-    public function run(Router $router, string $path = '/'): void
+    public function run(Router $router): void
     {
-        $method = $this->request->method();
-        $path = $this->request->server('PATH_INFO') ?? $path;
+        $path = urldecode(parse_url($this->request->server('REQUEST_URI'), PHP_URL_PATH));
+        $method = strtoupper($this->request->get('_method', $this->request->method()));
 
         $routeMatch = false;
         $methodMatch = false;
@@ -115,10 +156,6 @@ class Service
             }
         }
 
-        if ($routeMatch && !$methodMatch) {
-            notAllowed();
-        } else if (!$routeMatch) {
-            notFound();
-        }
+        $this->outOfRoute($routeMatch, $methodMatch);
     }
 }

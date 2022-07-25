@@ -69,6 +69,8 @@ class Render
      * Eksekusi template html
      * 
      * @return void
+     * 
+     * @throws InvalidArgumentException
      */
     public function show(): void
     {

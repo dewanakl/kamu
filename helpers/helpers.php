@@ -109,7 +109,8 @@ if (!function_exists('dd')) {
      */
     function dd(mixed ...$param): void
     {
-        show('errors/dd', [
+        header('Content-Type: text/html');
+        show('../helpers/errors/dd', [
             'param' => $param
         ]);
         exit;
@@ -125,7 +126,7 @@ if (!function_exists('abort')) {
     function abort(): void
     {
         header("HTTP/1.1 403 Forbidden");
-        show('errors/error', [
+        show('../helpers/errors/error', [
             'pesan' => 'Forbidden 403'
         ]);
         exit;
@@ -141,7 +142,7 @@ if (!function_exists('notFound')) {
     function notFound(): void
     {
         header("HTTP/1.1 404 Not Found");
-        show('errors/error', [
+        show('../helpers/errors/error', [
             'pesan' => 'Not Found 404'
         ]);
         exit;
@@ -157,7 +158,7 @@ if (!function_exists('notAllowed')) {
     function notAllowed(): void
     {
         header("HTTP/1.1 405 Method Not Allowed");
-        show('errors/error', [
+        show('../helpers/errors/error', [
             'pesan' => 'Method Not Allowed 405'
         ]);
         exit;
@@ -173,7 +174,7 @@ if (!function_exists('pageExpired')) {
     function pageExpired(): void
     {
         header("HTTP/1.1 400 Bad Request");
-        show('errors/error', [
+        show('../helpers/errors/error', [
             'pesan' => 'Page Expired !'
         ]);
         exit;
@@ -189,7 +190,7 @@ if (!function_exists('unavailable')) {
     function unavailable(): void
     {
         header("HTTP/1.1 503 Service Unavailable");
-        show('errors/error', [
+        show('../helpers/errors/error', [
             'pesan' => 'Service Unavailable !'
         ]);
         exit;
@@ -234,6 +235,18 @@ if (!function_exists('csrf')) {
     }
 }
 
+if (!function_exists('method')) {
+    /**
+     * Method untuk html
+     * 
+     * @return string
+     */
+    function method(string $type): string
+    {
+        return '<input type="hidden" name="_method" value="' . strtoupper($type) . '">' . PHP_EOL;
+    }
+}
+
 if (!function_exists('flash')) {
     /**
      * Ambil pesan dari session
@@ -258,6 +271,10 @@ if (!function_exists('asset')) {
      */
     function asset(string $param): string
     {
+        if (substr($param, 0, 1) != '/') {
+            $param = '/' . $param;
+        }
+
         return BASEURL . $param;
     }
 }
@@ -274,7 +291,7 @@ if (!function_exists('route')) {
      */
     function route(string $param, mixed ...$keys): string
     {
-        $regex = '([a-z0-9_]+(?:-[a-z0-9]+)*)';
+        $regex = '([a-zA-Z0-9_]+(?:-[a-zA-Z0-9]+)*)';
         $param = Route::getPath($param);
 
         foreach ($keys as $key) {
@@ -372,6 +389,19 @@ if (!function_exists('env')) {
     }
 }
 
+if (!function_exists('now')) {
+    /**
+     * Dapatkan waktu sekarang Y-m-d H:i:s
+     * 
+     * @param string $format
+     * @return string
+     */
+    function now(string $format = 'Y-m-d H:i:s'): string
+    {
+        return (new DateTime('now'))->format($format);
+    }
+}
+
 if (!function_exists('getPageTime')) {
     /**
      * Dapatkan waktu yang dibutuhkan untuk merender halaman
@@ -380,7 +410,7 @@ if (!function_exists('getPageTime')) {
      */
     function getPageTime(): string
     {
-        $time = floor(number_format(microtime(true) - startTime, 3, ''));
+        $time = floor(number_format(microtime(true) - START_TIME, 3, ''));
         return 'This page was generated in ' . $time . ' ms.';
     }
 }

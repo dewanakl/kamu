@@ -5,15 +5,44 @@ namespace Core;
 use Exception;
 use PDO;
 use PDOException;
+use Throwable;
 
+/**
+ * Hubungkan ke database yang ada dengan pdo
+ *
+ * @class DataBase
+ * @package Core
+ */
 class DataBase
 {
-    private $dbh;
+    /**
+     * Object PDO
+     * 
+     * @var object $pdo
+     */
+    private $pdo;
+
+    /**
+     * Statement dari query 
+     * 
+     * @var PDOStatement|false $stmt
+     */
     private $stmt;
+
+    /**
+     * Apakah transaksi
+     * 
+     * @var bool $transaction
+     */
     private $transaction;
 
-    private $query;
-
+    /**
+     * Buat objek database
+     *
+     * @return void
+     * 
+     * @throws PDOException
+     */
     function __construct()
     {
         $dsn = sprintf(
@@ -21,7 +50,7 @@ class DataBase
             env('DB_DRIV'),
             env('DB_HOST'),
             env('DB_NAME'),
-            env('DB_PORT'),
+            env('DB_PORT')
         );
 
         $option = [
@@ -30,36 +59,108 @@ class DataBase
         ];
 
         try {
-            $this->dbh = new PDO($dsn, env('DB_USER'), env('DB_PASS'), $option);
-        } catch (PDOException $e) {
-            if (DEBUG) {
-                throw new Exception($e->getMessage() . ' (SQL:' . $this->query . ')');
+            if (empty($this->pdo)) {
+                $this->pdo = new PDO($dsn, env('DB_USER'), env('DB_PASS'), $option);
             }
+
+            $this->transaction = false;
+        } catch (PDOException $e) {
+            try {
+                if (DEBUG) {
+                    $this->queryException($e);
+                }
+            } catch (Throwable) {
+                $this->queryException($e);
+            }
+
             return unavailable();
         }
     }
 
-    public function exec(string $command)
+    /**
+     * Tampilkan error
+     *
+     * @param mixed $e
+     * @return void
+     * 
+     * @throws Exception
+     */
+    private function queryException(mixed $e): void
+    {
+        $sql = (@$this->stmt->queryString) ? PHP_EOL . PHP_EOL . 'SQL: "' . $this->stmt->queryString . '"' : null;
+        throw new Exception($e->getMessage() . $sql);
+    }
+
+    /**
+     * Mulai transaksinya
+     *
+     * @return bool
+     */
+    public function startTransaction(): bool
+    {
+        $this->transaction = true;
+        return $this->pdo->beginTransaction();
+    }
+
+    /**
+     * Akhiri transaksinya
+     *
+     * @return bool
+     */
+    public function endTransaction(): bool
+    {
+        if ($this->transaction) {
+            return $this->pdo->commit();
+        }
+
+        return false;
+    }
+
+    /**
+     * Eksekusi raw sql
+     *
+     * @param string $command
+     * @return int|false
+     * 
+     * @throws PDOException
+     */
+    public function exec(string $command): int|false
     {
         try {
-            //$this->dbh->beginTransaction();
-            $result = $this->dbh->exec($command);
-            //$this->dbh->commit();
-
-            return $result;
+            return $this->pdo->exec($command);
         } catch (PDOException $e) {
-            //$this->dbh->rollBack();
-            throw new Exception($e->getMessage());
+            try {
+                if (DEBUG) {
+                    $this->queryException($e);
+                }
+            } catch (Throwable) {
+                $this->queryException($e);
+            }
+
+            return false;
         }
     }
 
+    /**
+     * Siapkan querynya
+     *
+     * @param string $query
+     * @return void
+     */
     public function query(string $query): void
     {
-        $this->query = $query;
-        $this->stmt = $this->dbh->prepare($this->query);
+        $this->stmt = $this->pdo->prepare($query);
     }
 
-    public function bind($param, $value, $type = null): void
+    /**
+     * Siapkan juga valuenya
+     *
+     * @param int|string $param
+     * @param mixed $value
+     * @param ?int $type
+     * @return void
+     */
+    public function bind(int|string $param, mixed $value, ?int $type = null): void
     {
         if (is_null($type)) {
             switch (true) {
@@ -77,55 +178,84 @@ class DataBase
                     break;
             }
         }
+
         $this->stmt->bindValue($param, $value, $type);
     }
 
-    public function setTransaction()
-    {
-        $this->transaction = true;
-        $this->dbh->beginTransaction();
-    }
-
-    public function execute()
+    /**
+     * Eksekusi juga
+     *
+     * @return mixed
+     * 
+     * @throws Exception
+     */
+    public function execute(): mixed
     {
         try {
-            $result = $this->stmt->execute();
+            return $this->stmt->execute();
+        } catch (Exception $e) {
             if ($this->transaction) {
-                $this->dbh->commit();
+                $this->pdo->rollBack();
             }
 
-            return $result;
-        } catch (PDOException $e) {
-            if ($this->transaction) {
-                $this->dbh->rollBack();
+            try {
+                if (DEBUG) {
+                    $this->queryException($e);
+                }
+            } catch (Throwable) {
+                $this->queryException($e);
             }
 
-            if (DEBUG) {
-                throw new Exception($e->getMessage() . ' (SQL: ' . $this->stmt->queryString . ')');
-            }
-            return false;
+            return unavailable();
         }
     }
 
-    public function getAll()
+    /**
+     * Tampilkan semua
+     *
+     * @return mixed
+     */
+    public function all(): mixed
     {
-        $this->execute();
-        return $this->stmt->fetchAll(PDO::FETCH_CLASS);
+        if (!$this->execute()) {
+            return false;
+        }
+
+        return $this->stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function get()
+    /**
+     * Tampilkan satu aja
+     *
+     * @return mixed
+     */
+    public function first(): mixed
     {
-        $this->execute();
-        return $this->stmt->fetch(PDO::FETCH_OBJ);
+        if (!$this->execute()) {
+            return false;
+        }
+
+        return $this->stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function rowCount()
+    /**
+     * Hitung jumlah rownya
+     *
+     * @return int
+     */
+    public function rowCount(): int
     {
         return $this->stmt->rowCount();
     }
 
-    public function lastInsertId(string $name = '')
+    /**
+     * Dapatkan idnya
+     * 
+     * @param ?string $name
+     * @return string|false
+     */
+    public function lastInsertId(?string $name = null): string|false
     {
-        return $this->dbh->lastInsertId($name);
+        return $this->pdo->lastInsertId($name);
     }
 }

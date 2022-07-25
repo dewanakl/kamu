@@ -15,7 +15,7 @@ final class Console
      * 
      * @var string|null $command
      */
-    private string|null $command;
+    private $command;
 
     /**
      * Perintah untuk eksekusi
@@ -32,40 +32,23 @@ final class Console
     private $timenow;
 
     /**
-     * Text warna hijau
+     * Apakah versi cmd dibawah 10 ?
      * 
-     * @var string $green
+     * @var bool $version
      */
-    private $green = "\033[32m";
+    private $version;
 
     /**
-     * Text warna kuning
-     * 
-     * @var string $yellow
-     */
-    private $yellow = "\033[33m";
-
-    /**
-     * Text warna biru muda
-     * 
-     * @var string $cyan
-     */
-    private $cyan = "\033[36m";
-
-    /**
-     * Text warna semula
-     * 
-     * @var string $normal
-     */
-    private $normal = "\033[37m";
-
-    /**
-     * Buat objek session
+     * Buat objek console
      *
+     * @param array $argv
      * @return void
      */
-    function __construct($argv)
+    function __construct(array $argv)
     {
+        $this->timenow = START_TIME;
+        $this->version = intval(php_uname('r')) >= 10 || !str_contains(php_uname('s'), 'Windows');
+
         if (PHP_MAJOR_VERSION < 8) {
             $this->exception('Minimal PHP 8 !');
         }
@@ -73,11 +56,48 @@ final class Console
         array_shift($argv);
         $this->command = $argv[0] ?? null;
         $this->options = $argv[1] ?? null;
-        $this->timenow = startTime;
 
-        print($this->green . "Kamu PHP Framework v1.0\n");
-        print($this->yellow . "Saya Console v1.0\n\n");
-        print($this->normal);
+        print($this->createColor('green', "Kamu PHP Framework v1.0\n"));
+        print($this->createColor('yellow', "Saya Console v1.0\n\n"));
+    }
+
+    /**
+     * Print spasi ketika selesai
+     *
+     * @return void
+     */
+    function __destruct()
+    {
+        print(PHP_EOL);
+    }
+
+    /**
+     * Buat warna untuk string
+     *
+     * @param string $name
+     * @param string $value
+     * @return string
+     */
+    private function createColor(string $name, string $value): string
+    {
+        if (!$this->version) {
+            return $value;
+        }
+
+        $colors = [
+            'green' => "\033[32m",
+            'yellow' => "\033[33m",
+            'cyan' => "\033[36m",
+            'red' => "\033[31m"
+        ];
+
+        foreach ($colors as $key => $val) {
+            if ($key == $name) {
+                return $val . $value . "\033[37m";
+            }
+        }
+
+        return $value;
     }
 
     /**
@@ -91,11 +111,11 @@ final class Console
     private function exception(string $message, bool $fail = true, ?string $options = null): void
     {
         if ($fail) {
-            exit("\033[31m$message\033[37m");
+            exit($this->createColor('red', $message . "\n"));
         }
 
         if ($options) {
-            echo "\n$options\n";
+            print($this->createColor('green', "\n$options\n"));
         }
     }
 
@@ -106,9 +126,11 @@ final class Console
      */
     private function executeTime(): string
     {
-        $result = '(' . floor(number_format(microtime(true) - $this->timenow, 3, '')) . ' ms)';
-        $this->timenow = microtime(true);
-        return $this->cyan . $result . $this->normal;
+        $now = microtime(true);
+        $result = floor(number_format($now - $this->timenow, 3, ''));
+        $this->timenow = $now;
+
+        return $this->createColor('cyan', '(' . $result . ' ms)');
     }
 
     /**
@@ -125,10 +147,10 @@ final class Console
         $files = array_diff($files, array('..', '.'));
 
         foreach ($files as $file) {
-            $arg = include $baseFile . $file;
+            $arg = require $baseFile . $file;
             ($up) ? $arg->up() : $arg->down();
-            $info = ($up) ? $this->green . ' Migrasi ' : $this->yellow . ' Migrasi kembali ';
-            print("\n" . $file . $info . $this->normal . $this->executeTime());
+            $info = ($up) ? $this->createColor('green', ' Migrasi ') : $this->createColor('yellow', ' Migrasi kembali ');
+            print("\n" . $file . $info . $this->executeTime());
         }
     }
 
@@ -139,9 +161,9 @@ final class Console
      */
     private function generator(): void
     {
-        $arg = include __DIR__ . '/../database/generator.php';
+        $arg = require_once __DIR__ . '/../database/generator.php';
         $arg->run();
-        print("\nGenerator" . $this->green . " berhasil " . $this->normal . $this->executeTime());
+        print("\nGenerator" . $this->createColor('green', ' berhasil ') . $this->executeTime());
     }
 
     /**
@@ -153,10 +175,10 @@ final class Console
     private function createMigrasi(?string $name): void
     {
         $this->exception('Butuh Nama file !', !$name);
-        $data = require_once __DIR__ . '/../helpers/templateMigrasi.php';
+        $data = require_once __DIR__ . '/../helpers/templates/templateMigrasi.php';
         $data = str_replace('NAME', $name, $data);
         $result = file_put_contents(__DIR__ . '/../database/schema/' . strtotime('now') . '_' . $name . '.php', $data);
-        $this->exception('Gagal membuat migrasi', !$result, 'Berhasil membuat migrasi');
+        $this->exception('Gagal membuat migrasi', !$result, 'Berhasil membuat migrasi ' . $name);
     }
 
     /**
@@ -168,10 +190,10 @@ final class Console
     private function createMiddleware(?string $name): void
     {
         $this->exception('Butuh Nama file !', !$name);
-        $data = require_once __DIR__ . '/../helpers/templateMiddleware.php';
+        $data = require_once __DIR__ . '/../helpers/templates/templateMiddleware.php';
         $data = str_replace('NAME', $name, $data);
         $result = file_put_contents(__DIR__ . '/../middleware/' . $name . '.php', $data);
-        $this->exception('Gagal membuat middleware', !$result, 'Berhasil membuat middleware');
+        $this->exception('Gagal membuat middleware', !$result, 'Berhasil membuat middleware ' . $name);
     }
 
     /**
@@ -183,10 +205,10 @@ final class Console
     private function createController(?string $name): void
     {
         $this->exception('Butuh Nama file !', !$name);
-        $data = require_once __DIR__ . '/../helpers/templateController.php';
+        $data = require_once __DIR__ . '/../helpers/templates/templateController.php';
         $data = str_replace('NAME', $name, $data);
         $result = file_put_contents(__DIR__ . '/../controllers/' . $name . '.php', $data);
-        $this->exception('Gagal membuat controller', !$result, 'Berhasil membuat controller');
+        $this->exception('Gagal membuat controller', !$result, 'Berhasil membuat controller ' . $name);
     }
 
     /**
@@ -198,11 +220,11 @@ final class Console
     private function createModel(?string $name): void
     {
         $this->exception('Butuh Nama file !', !$name);
-        $data = require_once __DIR__ . '/../helpers/templateModel.php';
+        $data = require_once __DIR__ . '/../helpers/templates/templateModel.php';
         $data = str_replace('NAME', $name, $data);
         $data = str_replace('NAMe', strtolower($name), $data);
         $result = file_put_contents(__DIR__ . '/../models/' . $name . '.php', $data);
-        $this->exception('Gagal membuat model', !$result, 'Berhasil membuat model');
+        $this->exception('Gagal membuat model', !$result, 'Berhasil membuat model ' . $name);
     }
 
     /**
@@ -215,44 +237,44 @@ final class Console
         $menus = [
             [
                 'command' => 'coba',
-                'description' => 'jalankan php dengan virtual server'
+                'description' => 'Jalankan php dengan virtual server'
             ],
             [
                 'command' => 'migrasi',
-                'description' => 'bikin tabel di database kamu [gen]'
+                'description' => 'Bikin tabel didatabase kamu [--gen]'
             ],
             [
                 'command' => 'migrasi:kembali',
-                'description' => 'kembalikan seperti awal databasenya'
+                'description' => 'Kembalikan seperti awal databasenya'
             ],
             [
                 'command' => 'migrasi:segar',
-                'description' => 'kembalikan seperti awal dan isi ulang [gen]'
+                'description' => 'Kembalikan seperti awal dan isi ulang [--gen]'
             ],
             [
                 'command' => 'generator',
-                'description' => 'isi nilai ke database'
+                'description' => 'Isi nilai ke databasenya'
             ],
             [
                 'command' => 'bikin:migrasi',
-                'description' => 'bikin file migrasi [nama file]'
+                'description' => 'Bikin file migrasi [nama file]'
             ],
             [
                 'command' => 'bikin:middleware',
-                'description' => 'bikin file middleware [nama file]'
+                'description' => 'Bikin file middleware [nama file]'
             ],
             [
                 'command' => 'bikin:controller',
-                'description' => 'bikin file controller [nama file]'
+                'description' => 'Bikin file controller [nama file]'
             ],
             [
                 'command' => 'bikin:model',
-                'description' => 'bikin file model [nama file]'
+                'description' => 'Bikin file model [nama file]'
             ],
         ];
 
         print("Penggunaan:\n perintah [options]\n\n");
-        $mask = $this->cyan . "%-20s" . $this->normal . " %-30s\n";
+        $mask = $this->createColor('cyan', "%-20s") . " %-30s\n";
 
         foreach ($menus as $value) {
             printf($mask, $value['command'], $value['description']);

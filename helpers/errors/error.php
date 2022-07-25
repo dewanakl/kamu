@@ -4,19 +4,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $pesan ?></title>
+    <title>Kamu - <?= e($pesan) ?></title>
     <style>
-        * {
-            transition: all 0.5s;
-        }
-
-        html {
-            height: 100%;
-        }
-
         body {
             font-family: 'Lato', sans-serif;
-            color: #888;
+            color: #555;
             margin: 0;
         }
 
@@ -33,15 +25,15 @@
         }
 
         .fof h1 {
-            font-size: 50px;
+            font-size: 40px;
             display: inline-block;
-            padding-right: 12px;
+            padding-right: 15px;
             animation: type .5s alternate infinite;
         }
 
         @keyframes type {
             from {
-                box-shadow: inset -3px 0px 0px #888;
+                box-shadow: inset -3px 0px 0px #555;
             }
 
             to {
@@ -54,7 +46,7 @@
 <body>
     <div id="main">
         <div class="fof">
-            <h1><?= $pesan ?></h1>
+            <h1><?= e($pesan) ?></h1>
         </div>
     </div>
 </body>

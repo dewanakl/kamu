@@ -1,19 +1,27 @@
 ## About Kamu
 
-Kamu adalah framework yang sangat sederhana.
-saking sederhananya, dokumentasinya juga apa adanya :v
-Next, pasti akan aku tuliskan disini hehee...
+Kamu adalah framework yang sangat sederhana. Saking sederhananya, dokumentasinya juga apa adanya :)
+
+> Intinya mirip dengan laravel, karena terinspirasi darinya
 
 ## How to run ?
 
-- cp .env.example .env
-- php saya coba
+- `cp .env.example .env`
+- `php saya coba`
 
-se simple itu hehee
+> Simple bukan ? hehee
+
+## Todo list
+
+- [ ] Upload file
+- [ ] Download file
+- [ ] Validasi file
+- [ ] Security check
+- [ ] API Improvement
 
 ## Warning
 
-Kamu framework is for educational purposes only
+Kamu framework is for educational purposes only but ready for production 
 
 ## License
 

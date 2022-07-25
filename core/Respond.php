@@ -15,14 +15,14 @@ class Respond
      * 
      * @var Request $request
      */
-    private Request $request;
+    private $request;
 
     /**
      * Session obj
      * 
      * @var Session $session
      */
-    private Session $session;
+    private $session;
 
     /**
      * Url redirect
@@ -82,11 +82,11 @@ class Respond
     /**
      * Ubah ke json
      * 
-     * @param array $data
+     * @param mixed $data
      * @param int $statusCode 
      * @return string|false
      */
-    public function json(array $data, int $statusCode = 200): string|false
+    public function json(mixed $data, int $statusCode = 200): string|false
     {
         $this->httpCode($statusCode);
         header('Content-Type: application/json');
@@ -117,31 +117,37 @@ class Respond
     public function redirect(string $uri): void
     {
         $this->session->unset('token');
-        header('Location: ' . BASEURL . $uri, true, 302);
+        $uri = str_contains($uri, BASEURL) ? $uri : BASEURL . $uri;
+        header('Location: ' . $uri, true, 302);
         $this->terminate();
     }
 
     /**
      * Tampilkan responnya
      * 
-     * @param mixed $obj
+     * @param mixed $respond
      * @return void
      */
-    public function send(mixed $obj): void
+    public function send(mixed $respond): void
     {
-        if (is_string($obj) || $obj instanceof Render) {
-            $this->session->set('oldRoute', $this->request->server('REQUEST_URI'));
-            $this->session->unset('old');
-            $this->session->unset('error');
-            $this->terminate($obj);
-        } else if ($obj instanceof Respond) {
+        if (is_string($respond) || $respond instanceof Render) {
+            if (!$this->request->ajax() || !$this->request->renderJson()) {
+                $this->session->set('oldRoute', $this->request->server('REQUEST_URI'));
+                $this->session->unset('old');
+                $this->session->unset('error');
+            }
+
+            $this->terminate($respond);
+        }
+
+        if ($respond instanceof Respond) {
             if (!is_null($this->redirect)) {
                 $this->redirect($this->redirect);
             }
         }
 
-        if (!is_null($obj)) {
-            dd($obj);
+        if (!is_null($respond)) {
+            dd($respond);
         }
     }
 

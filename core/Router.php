@@ -55,11 +55,11 @@ class Router
      */
     public static function self(): Router
     {
-        if (!(static::$self instanceof Router)) {
-            static::$self = new self;
+        if (!(self::$self instanceof Router)) {
+            self::$self = new self;
         }
 
-        return static::$self;
+        return self::$self;
     }
 
     /**
@@ -80,7 +80,7 @@ class Router
             $function = $action;
         }
 
-        $path = preg_replace('/{(\w+)}/', '([a-z0-9_]+(?:-[a-z0-9]+)*)', $path);
+        $path = preg_replace('/{(\w+)}/', '([a-zA-Z0-9_]+(?:-[a-zA-Z0-9]+)*)', $path);
 
         $this->routes[] = [
             'method' => $method,
@@ -116,6 +116,30 @@ class Router
     public function post(string $path, array|string $action): Router
     {
         return $this->add('POST', $path, $action);
+    }
+
+    /**
+     * Simpan url route put
+     *
+     * @param string $path
+     * @param array|string $action
+     * @return Router
+     */
+    public function put(string $path, array|string $action): Router
+    {
+        return $this->add('PUT', $path, $action);
+    }
+
+    /**
+     * Simpan url route delete
+     *
+     * @param string $path
+     * @param array|string $action
+     * @return Router
+     */
+    public function delete(string $path, array|string $action): Router
+    {
+        return $this->add('DELETE', $path, $action);
     }
 
     /**
@@ -231,7 +255,7 @@ class Router
 
                 if (!is_null($tempPrefix)) {
                     $old = $this->routes[$id]['path'];
-                    $prefix = preg_replace('/{(\w+)}/', '([a-z0-9_]+(?:-[a-z0-9]+)*)', $tempPrefix);
+                    $prefix = preg_replace('/{(\w+)}/', '([a-zA-Z0-9_]+(?:-[a-zA-Z0-9]+)*)', $tempPrefix);
                     $result = ($old != '/') ? $prefix . $old : $prefix;
                     $this->routes[$id]['path'] = $result;
                 }

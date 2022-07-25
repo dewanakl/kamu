@@ -12,7 +12,7 @@ interface MiddlewareInterface
      *
      * @param Request $request
      * @param Closure $next
-     * @return Closure
+     * @return mixed
      */
     public function handle(Request $request, Closure $next);
 }

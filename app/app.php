@@ -2,7 +2,7 @@
 
 /**
  * Kamu PHP Framework
- * for educational purposes
+ * for educational purposes || ready for production
  * 
  * @author dewanakl
  * @see https://github.com/dewanakl/Kamu
@@ -30,6 +30,11 @@ require_once 'bootstrap.php';
 require_once __DIR__ . '/../routes/routes.php';
 require_once __DIR__ . '/../helpers/helpers.php';
 
-set_exception_handler(fn ($error) => show('errors/trace', [
-    'error' => $error
-]));
+set_exception_handler(function (mixed $error) {
+    header('Content-Type: text/html');
+    if (!DEBUG) {
+        unavailable();
+    }
+
+    show('../helpers/errors/trace', compact('error'));
+});

@@ -20,7 +20,62 @@ class Application
      * 
      * @var array $objectPool
      */
-    private array $objectPool = [];
+    private array $objectPool;
+
+    /**
+     * Buat objek application
+     *
+     * @return void
+     */
+    function __construct()
+    {
+        $this->objectPool = [];
+    }
+
+    /**
+     * Inject pada constructor yang akan di buat objek
+     *
+     * @param string $name
+     * @param array $param
+     * @return object
+     */
+    private function getConstructor(string $name, array $param = []): object
+    {
+        $reflector = new ReflectionClass($name);
+
+        $constructor = $reflector->getConstructor();
+        $args = is_null($constructor) ? null : $constructor->getParameters();
+
+        return $reflector->newInstanceArgs($this->getDependencies($args, $param));
+    }
+
+    /**
+     * Cek apa aja yang dibutuhkan untuk injek objek atau parameter
+     *
+     * @param ?array $parameters
+     * @param array $value
+     * @return array
+     */
+    private function getDependencies(?array $parameters = null, array $value = []): array
+    {
+        $args = [];
+        $paramid = 0;
+
+        if (!$parameters) {
+            return $args;
+        }
+
+        foreach ($parameters as $parameter) {
+            if ($parameter->getType() && !$parameter->getType()->isBuiltin()) {
+                $args[] = $this->singleton($parameter->getType()->getName());
+            } else {
+                $args[] = $value[$paramid] ?? $parameter->getDefaultValue();
+                $paramid++;
+            }
+        }
+
+        return $args;
+    }
 
     /**
      * Bikin objek dari sebuah class lalu menyimpannya
@@ -55,18 +110,15 @@ class Application
     /**
      * Inject objek pada suatu fungsi yang akan di eksekusi
      *
-     * @param ?string $name
+     * @param string $name
      * @param string $method
      * @param array $value
      * @return mixed
+     * 
+     * @throws Exception
      */
-    public function invoke(?string $name, string $method, array $value = []): mixed
+    public function invoke(string $name, string $method, array $value = []): mixed
     {
-        if (is_null($name)) {
-            $name = $method;
-            $method = '__invoke';
-        }
-
         $name = $this->singleton($name);
 
         $reflector = new ReflectionClass($name);
@@ -76,52 +128,7 @@ class Application
             $reflectionMethod = new ReflectionMethod($name, $method);
             return $reflectionMethod->invokeArgs($name, $params);
         } catch (ReflectionException $e) {
-            throw new Exception('Gagal memanggil method ' . $method . ' - ' . $e->getMessage());
+            throw new Exception($e->getMessage());
         }
-    }
-
-    /**
-     * Inject objek pada constructor yang akan di buat objek
-     *
-     * @param string $name
-     * @param array $param
-     * @return object
-     */
-    private function getConstructor(string $name, array $param = []): object
-    {
-        $reflector = new ReflectionClass($name);
-
-        $constructor = $reflector->getConstructor();
-        $args = is_null($constructor) ? null : $constructor->getParameters();
-
-        return $reflector->newInstanceArgs($this->getDependencies($args, $param));
-    }
-
-    /**
-     * Cek apa aja yang dibutuhkan untuk injek objek atau parameter
-     *
-     * @param ?array $parameters
-     * @param array $value
-     * @return array
-     */
-    private function getDependencies(?array $parameters = null, array $value = []): array
-    {
-        $args = [];
-        $param = 0;
-
-        if (!$parameters) {
-            return $args;
-        }
-
-        foreach ($parameters as $parameter) {
-            if ($parameter->getType() && !$parameter->getType()->isBuiltin()) {
-                $args[] = $this->singleton($parameter->getType()->getName());
-            } else {
-                $args[] = $value[$param] ?? $parameter->getDefaultValue();
-                $param++;
-            }
-        }
-
-        return $args;
     }
 }

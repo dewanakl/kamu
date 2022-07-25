@@ -22,8 +22,10 @@ return new class
     {
         Schema::create(\'NAME\', function (Table $table) {
             $table->id();
-            $table->timeStamp();
+
             //
+
+            $table->timeStamp();
         });
     }
 

@@ -7,6 +7,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kamu - Error</title>
     <style>
+        pre {
+            font-size: 22px;
+            font-weight: bold;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .font {
+            font-family: monospace;
+            font-size: 15px;
+        }
+
         th {
             background-color: #aaaaaa;
         }
@@ -15,7 +28,6 @@
             text-align: left;
             height: 25px;
             border-bottom: 1px solid #bbb;
-            cursor: context-menu;
         }
 
         tr:hover {
@@ -24,10 +36,10 @@
     </style>
 </head>
 
-<body>
-    <div style="display: grid;">
-        <h2><?= $error->getMessage() ?></h2>
-        <p><?= $error->getFile() . '::' . $error->getLine() ?></p>
+<body style="display: grid;">
+    <pre><?= e($error->getMessage()) ?></pre>
+    <div class="font">
+        <p><?= e($error->getFile()) . '::' . e($error->getLine()) ?></p>
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse;">
                 <tr>
@@ -39,9 +51,9 @@
                 <?php foreach ($error->getTrace() as $key => $value) : ?>
                     <tr>
                         <td><?= $key + 1 ?></td>
-                        <td><?= $value['file'] ?? '-' ?></td>
-                        <td><?= $value['line'] ?? '-' ?></td>
-                        <td><?= @$value['class'] ? $value['class'] . $value['type'] . $value['function'] : $value['function'] ?></td>
+                        <td><?= e($value['file'] ?? '-') ?></td>
+                        <td><?= e($value['line'] ?? '-') ?></td>
+                        <td><?= @$value['class'] ? e($value['class'] . $value['type'] . $value['function']) : e($value['function']) ?></td>
                     </tr>
                 <?php endforeach ?>
             </table>

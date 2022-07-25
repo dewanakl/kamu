@@ -35,6 +35,30 @@ final class Route
     }
 
     /**
+     * Simpan url route put
+     *
+     * @param string $path
+     * @param array|string $action
+     * @return Router
+     */
+    public static function put(string $path, array|string $action): Router
+    {
+        return static::router()->put($path, $action);
+    }
+
+    /**
+     * Simpan url route delete
+     *
+     * @param string $path
+     * @param array|string $action
+     * @return Router
+     */
+    public static function delete(string $path, array|string $action): Router
+    {
+        return static::router()->delete($path, $action);
+    }
+
+    /**
      * Tambahkan middleware dalam url route
      *
      * @param array|string $middlewares
