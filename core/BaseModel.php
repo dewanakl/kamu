@@ -120,7 +120,7 @@ class BaseModel implements IteratorAggregate, JsonSerializable
      */
     private function checkSelect(): void
     {
-        if (!str_contains(strtolower($this->query), 'select')) {
+        if (!str_contains($this->query ?? '', 'SELECT')) {
             $this->query = 'SELECT * FROM ' . $this->table . $this->query;
         }
     }
@@ -246,11 +246,11 @@ class BaseModel implements IteratorAggregate, JsonSerializable
     public function where(string $column, mixed $value, string $statment = '=', string $agr = 'AND'): self
     {
         if (!$this->query && !$this->param) {
-            $this->query = sprintf('SELECT * FROM %s', $this->table);
+            $this->query = 'SELECT * FROM ' . $this->table;
         }
 
-        if (!str_contains(strtolower($this->query), 'where')) {
-            $agr = "WHERE";
+        if (!str_contains($this->query ?? '', 'WHERE')) {
+            $agr = 'WHERE';
         }
 
         $replaceColumn = str_replace('.', '', $column);
@@ -504,10 +504,10 @@ class BaseModel implements IteratorAggregate, JsonSerializable
             $data = array_merge($data, [$this->dates[1] => now('Y-m-d H:i:s.u')]);
         }
 
-        $this->query = str_replace('SELECT * FROM', 'UPDATE', $this->query);
-        $query = 'SET ' . implode(', ',  array_map(fn ($data) => $data . ' = :' . $data, array_keys($data))) . ' WHERE';
+        $query = ($this->query) ? str_replace('SELECT * FROM', 'UPDATE', $this->query) : 'UPDATE ' . $this->table . ' WHERE';
+        $setQuery = 'SET ' . implode(', ',  array_map(fn ($data) => $data . ' = :' . $data, array_keys($data))) . (($this->query) ? ' WHERE' : '');
 
-        $this->bind(str_replace('WHERE', $query, $this->query), array_merge($data, $this->param));
+        $this->bind(str_replace('WHERE', $setQuery, $query), array_merge($data, $this->param ?? []));
         $result = $this->db->execute();
 
         if ($result === false) {
