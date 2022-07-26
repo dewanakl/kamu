@@ -80,7 +80,7 @@ if (!function_exists('show')) {
             return $template;
         }
 
-        ob_end_clean();
+        @ob_end_clean();
         echo $template;
         return null;
     }
