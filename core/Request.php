@@ -113,6 +113,14 @@ class Request
                     }
                     break;
 
+                case $rule == 'url':
+                    if (filter_var($value, FILTER_VALIDATE_URL)) {
+                        $this->__set($param, filter_var($value, FILTER_SANITIZE_URL));
+                    } else {
+                        $this->setError($param, 'ilegal atau tidak sah !');
+                    }
+                    break;
+
                 case $rule == 'int':
                     if (is_numeric($value)) {
                         $this->__set($param, intval($value));
@@ -238,13 +246,54 @@ class Request
     }
 
     /**
+     * Dapatkan ipnya
+     *
+     * @return string
+     */
+    public function ip(): string
+    {
+        if ($this->server('HTTP_CLIENT_IP')) {
+            return $this->server('HTTP_CLIENT_IP');
+        }
+
+        if ($this->server('HTTP_X_FORWARDED_FOR')) {
+            $ipList = explode(',', $this->server('HTTP_X_FORWARDED_FOR'));
+            foreach ($ipList as $ip) {
+                if (!empty($ip)) {
+                    return $ip;
+                }
+            }
+        }
+
+        if ($this->server('HTTP_X_FORWARDED')) {
+            return $this->server('HTTP_X_FORWARDED');
+        }
+
+        if ($this->server('HTTP_X_CLUSTER_CLIENT_IP')) {
+            return $this->server('HTTP_X_CLUSTER_CLIENT_IP');
+        }
+
+        if ($this->server('HTTP_FORWARDED_FOR')) {
+            return $this->server('HTTP_FORWARDED_FOR');
+        }
+
+        if ($this->server('HTTP_FORWARDED')) {
+            return $this->server('HTTP_FORWARDED');
+        }
+
+        if ($this->server('REMOTE_ADDR')) {
+            return $this->server('REMOTE_ADDR');
+        }
+    }
+
+    /**
      * Cek apakah ajax ?
      *
      * @return string|false
      */
     public function ajax(): string|false
     {
-        if ($this->server('HTTP_CONTENT_TYPE') && $this->server('HTTP_COOKIE') && $this->server('HTTP_TOKEN')) {
+        if ($this->server('CONTENT_TYPE') && $this->server('HTTP_COOKIE') && $this->server('HTTP_TOKEN')) {
             return $this->server('HTTP_TOKEN');
         }
 
