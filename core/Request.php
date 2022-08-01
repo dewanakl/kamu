@@ -141,6 +141,10 @@ class Request
                     $this->__set($param, strval($value));
                     break;
 
+                case $rule == 'slug':
+                    $this->__set($param, preg_replace('/[^\w-]/', '', $value));
+                    break;
+
                 case $rule == 'hash':
                     $this->__set($param, password_hash($value, PASSWORD_BCRYPT));
                     break;

@@ -80,7 +80,7 @@ class Router
             $function = $action;
         }
 
-        $path = preg_replace('/{(\w+)}/', '([a-zA-Z0-9_]+(?:-[a-zA-Z0-9]+)*)', $path);
+        $path = preg_replace('/{(\w+)}/', '([\w-]*)', $path);
 
         $this->routes[] = [
             'method' => $method,
@@ -255,7 +255,7 @@ class Router
 
                 if (!is_null($tempPrefix)) {
                     $old = $this->routes[$id]['path'];
-                    $prefix = preg_replace('/{(\w+)}/', '([a-zA-Z0-9_]+(?:-[a-zA-Z0-9]+)*)', $tempPrefix);
+                    $prefix = preg_replace('/{(\w+)}/', '([\w-]*)', $tempPrefix);
                     $result = ($old != '/') ? $prefix . $old : $prefix;
                     $this->routes[$id]['path'] = $result;
                 }

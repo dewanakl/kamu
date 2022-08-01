@@ -3,6 +3,7 @@
 namespace Core;
 
 use ArrayIterator;
+use Closure;
 use IteratorAggregate;
 use JsonSerializable;
 use ReturnTypeWillChange;
@@ -433,6 +434,21 @@ class BaseModel implements IteratorAggregate, JsonSerializable
         }
 
         return $result;
+    }
+
+    /**
+     * Error dengan fungsi
+     *
+     * @param Closure $fn
+     * @return mixed
+     */
+    public function failFunction(Closure $fn): mixed
+    {
+        if (!$this->attributes) {
+            return $fn();
+        }
+
+        return $this;
     }
 
     /**

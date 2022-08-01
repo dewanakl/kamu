@@ -1,7 +1,7 @@
 <?php
 
 use Core\App;
-use Core\Auth;
+use Core\AuthManager;
 use Core\Render;
 use Core\Request;
 use Core\Respond;
@@ -51,13 +51,13 @@ if (!function_exists('respond')) {
 
 if (!function_exists('auth')) {
     /**
-     * Helper method untuk membuat objek auth
+     * Helper method untuk membuat objek AuthManager
      * 
-     * @return Auth
+     * @return AuthManager
      */
-    function auth(): Auth
+    function auth(): AuthManager
     {
-        return app(Auth::class);
+        return app(AuthManager::class);
     }
 }
 
@@ -291,7 +291,7 @@ if (!function_exists('route')) {
      */
     function route(string $param, mixed ...$keys): string
     {
-        $regex = '([a-zA-Z0-9_]+(?:-[a-zA-Z0-9]+)*)';
+        $regex = '([\w-]*)';
         $param = Route::getPath($param);
 
         foreach ($keys as $key) {

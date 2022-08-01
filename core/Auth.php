@@ -2,113 +2,47 @@
 
 namespace Core;
 
-use Exception;
-use Models\User;
-
 /**
- * Autentikasi user dengan model database
+ * Helper class Autentikasi
  *
  * @class Auth
  * @package Core
  */
-class Auth
+final class Auth
 {
     /**
-     * Object model
-     * 
-     * @var BaseModel $user
+     * Eksekusi method pada AuthManager
+     *
+     * @param string $method
+     * @param array $parameters
+     * @return mixed
      */
-    private $user;
-
-    /**
-     * Check usernya
-     * 
-     * @return bool
-     */
-    public function check(): bool
+    private static function call(string $method, array $parameters): mixed
     {
-        return !empty($this->user());
+        return App::get()->invoke(AuthManager::class, $method, $parameters);
     }
 
     /**
-     * Dapatkan obejek usernya
-     * 
-     * @return BaseModel|null
+     * Panggil method secara static
+     *
+     * @param string $method
+     * @param array $parameters
+     * @return mixed
      */
-    public function user(): BaseModel|null
+    public static function __callStatic(string $method, array $parameters): mixed
     {
-        if (!empty($this->user)) {
-            return $this->user;
-        }
-
-        $user = session()->get('_user');
-        if (!empty($user)) {
-            $this->user = unserialize(base64_decode($user))->refresh();
-        }
-
-        return $this->user;
+        return self::call($method, $parameters);
     }
 
     /**
-     * Logoutkan usernya
-     * 
-     * @return void
+     * Panggil method secara object
+     *
+     * @param string $method
+     * @param array $parameters
+     * @return mixed
      */
-    public function logout(): void
+    public function __call(string $method, array $parameters): mixed
     {
-        $this->user = null;
-        session()->unset('_user');
-    }
-
-    /**
-     * Loginkan usernya dengan object
-     * 
-     * @param object $user
-     * @return void
-     * 
-     * @throws Exception
-     */
-    public function login(object $user): void
-    {
-        if (!($user instanceof BaseModel)) {
-            throw new Exception('Class ' . get_class($user) . ' bukan BaseModel !');
-        }
-
-        $this->logout();
-        $this->user = $user;
-        session()->set('_user', base64_encode(serialize($user)));
-    }
-
-    /**
-     * Loginkan usernya
-     * 
-     * @param array $credential
-     * @param ?string $model
-     * @return bool
-     */
-    public function attempt(array $credential, ?string $model = null): bool
-    {
-        $data = array_keys($credential);
-
-        $first = $data[0];
-        $last = $data[1];
-
-        if (!$model) {
-            $model = User::class;
-        }
-
-        $this->user = app($model)->find($credential[$first], $first);
-        $password = password_verify($credential[$last], $this->user->$last);
-
-        if ($this->user->id && $password) {
-            session()->set('_user', base64_encode(serialize($this->user)));
-            return true;
-        }
-
-        session()->set('old', [$first => $credential[$first]]);
-        session()->set('error', [$first => "$first atau $last salah !"]);
-
-        $this->logout();
-        return false;
+        return self::call($method, $parameters);
     }
 }
