@@ -36,5 +36,6 @@ set_exception_handler(function (mixed $error) {
         unavailable();
     }
 
+    header('HTTP/1.1 500 Internal Server Error');
     show('../helpers/errors/trace', compact('error'));
 });

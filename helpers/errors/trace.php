@@ -36,11 +36,11 @@
     </style>
 </head>
 
-<body style="display: grid;">
+<body>
     <pre><?= e($error->getMessage()) ?></pre>
-    <div class="font">
-        <p><?= e($error->getFile()) . '::' . e($error->getLine()) ?></p>
-        <div style="overflow-x: auto;">
+    <div style="overflow-x: auto;">
+        <div class="font">
+            <p><?= e($error->getFile()) . '::' . e($error->getLine()) ?></p>
             <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                     <th>No</th>

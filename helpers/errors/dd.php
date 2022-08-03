@@ -8,9 +8,7 @@
     <title>Kamu - Debug</title>
     <style>
         pre {
-            margin-top: 20px;
-            margin-bottom: 30px;
-            margin-left: 10px;
+            margin: 20px 10px;
             font-size: 14px;
             overflow: auto;
             white-space: pre-wrap;
@@ -19,7 +17,7 @@
     </style>
 </head>
 
-<body style="display: grid;">
+<body>
     <?php
     foreach ($param as $val) {
         ob_start();

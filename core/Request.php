@@ -32,18 +32,11 @@ class Request
     private $fileData;
 
     /**
-     * Error tampung disini
+     * Object validator
      * 
-     * @var array $errors
+     * @var Validator $validator
      */
-    private array $errors = [];
-
-    /**
-     * Throw error lewat json
-     * 
-     * @var bool $json
-     */
-    private $json;
+    private $validator;
 
     /**
      * Init objek
@@ -65,163 +58,13 @@ class Request
      * 
      * @return void
      */
-    private function isError(): void
+    private function fails(): void
     {
-        if (empty($this->errors)) {
-            return;
+        if ($this->validator->fails()) {
+            session()->set('old', $this->all());
+            session()->set('error', $this->validator->failed());
+            respond()->redirect(session()->get('oldRoute', '/'));
         }
-
-        if ($this->ajax() || $this->json) {
-            respond()->terminate(respond()->json([
-                'error' => $this->errors
-            ], 400));
-        }
-
-        session()->set('old', $this->get());
-        session()->set('error', $this->errors);
-        respond()->redirect(session()->get('oldRoute', '/'));
-    }
-
-    /**
-     * Validasi rule request yang masuk
-     * 
-     * @param string $param
-     * @param array $rules
-     * @return void
-     */
-    private function validateRule(string $param, array $rules): void
-    {
-        foreach ($rules as $rule) {
-            if (!empty($this->errors[$param])) {
-                continue;
-            }
-
-            $value = $this->__get($param);
-
-            switch (true) {
-                case $rule == 'required':
-                    if (!$this->__isset($param) || empty(trim($value))) {
-                        $this->setError($param, 'dibutuhkan !');
-                    }
-                    break;
-
-                case $rule == 'email':
-                    if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                        $this->__set($param, filter_var($value, FILTER_SANITIZE_EMAIL));
-                    } else {
-                        $this->setError($param, 'ilegal atau tidak sah !');
-                    }
-                    break;
-
-                case $rule == 'url':
-                    if (filter_var($value, FILTER_VALIDATE_URL)) {
-                        $this->__set($param, filter_var($value, FILTER_SANITIZE_URL));
-                    } else {
-                        $this->setError($param, 'ilegal atau tidak sah !');
-                    }
-                    break;
-
-                case $rule == 'int':
-                    if (is_numeric($value)) {
-                        $this->__set($param, intval($value));
-                    } else {
-                        $this->setError($param, 'harus angka !');
-                    }
-                    break;
-
-                case $rule == 'float':
-                    if (is_numeric($value)) {
-                        $this->__set($param, floatval($value));
-                    } else {
-                        $this->setError($param, 'harus desimal !');
-                    }
-                    break;
-
-                case $rule == 'str':
-                    $this->__set($param, strval($value));
-                    break;
-
-                case $rule == 'slug':
-                    $this->__set($param, preg_replace('/[^\w-]/', '', $value));
-                    break;
-
-                case $rule == 'hash':
-                    $this->__set($param, password_hash($value, PASSWORD_BCRYPT));
-                    break;
-
-                case str_contains($rule, 'min'):
-                    $min = explode(':', $rule)[1];
-                    if (strlen($value) < $min) {
-                        $this->setError($param, 'panjang minimal', $min);
-                    }
-                    break;
-
-                case str_contains($rule, 'max'):
-                    $max = explode(':', $rule)[1];
-                    if (strlen($value) > $max) {
-                        $this->setError($param, 'panjang maximal', $max);
-                    }
-                    break;
-
-                case str_contains($rule, 'sama'):
-                    $target = explode(':', $rule)[1];
-                    if ($this->__get($target) != $value) {
-                        $this->setError($param, 'tidak sama dengan', $target);
-                    }
-                    break;
-
-                case str_contains($rule, 'unik'):
-                    $command = explode(':', $rule);
-                    $model = '\Models\\' . (empty($command[1]) ? 'User' : ucfirst($command[1]));
-                    $column = $command[2] ?? $param;
-
-                    $user = app($model)->find($value, $column);
-                    if ($user->$column) {
-                        $this->setError($param, 'sudah ada !');
-                    }
-                    break;
-
-                default:
-                    $this->__set($param, trim($value));
-                    break;
-            }
-        }
-    }
-
-    /**
-     * Set error to array errors
-     *
-     * @param string $param
-     * @param string $alert
-     * @param string|int $optional
-     * @return void
-     */
-    private function setError(string $param, string $alert, string|int $optional = null): void
-    {
-        if (empty($this->errors[$param])) {
-            $this->errors[$param] = "$param $alert" . ($optional ? " $optional" : null);
-        }
-    }
-
-    /**
-     * Output error json
-     *
-     * @return self
-     */
-    public function json(): self
-    {
-        $this->json = true;
-        return $this;
-    }
-
-    /**
-     * Apakah untuk json ?
-     * 
-     * @return bool
-     */
-    public function renderJson(): bool
-    {
-        return $this->json ?? false;
     }
 
     /**
@@ -312,13 +155,9 @@ class Request
      */
     public function validate(array $params = []): array
     {
-        foreach ($params as $param => $rules) {
-            $this->validateRule($param, $rules);
-            $params[$param] = $this->get($param);
-        }
-
-        $this->isError();
-        return $params;
+        $this->validator = Validator::make($this->all(), $params);
+        $this->fails();
+        return $this->validator->validated();
     }
 
     /**
@@ -342,10 +181,10 @@ class Request
      * @param array $error
      * @return void
      */
-    public function throwError(array $error = []): void
+    public function throw(array $error = []): void
     {
-        $this->errors = array_merge($this->errors, $error);
-        $this->isError();
+        $this->validator->throw($error);
+        $this->fails();
     }
 
     /**
@@ -372,6 +211,38 @@ class Request
     public function all(): array
     {
         return $this->get();
+    }
+
+    /**
+     * Ambil sebagian dari request
+     * 
+     * @param array $only
+     * @return array
+     */
+    public function only(array $only): array
+    {
+        $temp = [];
+        foreach ($only as $ol) {
+            $temp[$ol] = $this->__get($ol);
+        }
+        return $temp;
+    }
+
+    /**
+     * Ambil kecuali dari request
+     * 
+     * @param array $except
+     * @return array
+     */
+    public function except(array $except): array
+    {
+        $temp = [];
+        foreach ($this->all() as $key => $value) {
+            if (!in_array($key, $except)) {
+                $temp[$key] = $value;
+            }
+        }
+        return $temp;
     }
 
     /**

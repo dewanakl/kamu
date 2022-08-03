@@ -90,7 +90,7 @@ class Respond
     {
         $this->httpCode($statusCode);
         header('Content-Type: application/json');
-        return json_encode($data, JSON_PRETTY_PRINT);
+        return json_encode($data);
     }
 
     /**
@@ -118,6 +118,9 @@ class Respond
     {
         $this->session->unset('token');
         $uri = str_contains($uri, BASEURL) ? $uri : BASEURL . $uri;
+
+        $this->httpCode(302);
+        header('HTTP/1.1 302 Found');
         header('Location: ' . $uri, true, 302);
         $this->terminate();
     }
@@ -131,7 +134,7 @@ class Respond
     public function send(mixed $respond): void
     {
         if (is_string($respond) || $respond instanceof Render) {
-            if (!$this->request->ajax() || !$this->request->renderJson()) {
+            if ($respond instanceof Render) {
                 $this->session->set('oldRoute', $this->request->server('REQUEST_URI'));
                 $this->session->unset('old');
                 $this->session->unset('error');

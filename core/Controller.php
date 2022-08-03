@@ -54,4 +54,16 @@ abstract class Controller
     {
         return app(Respond::class)->json($data, $statusCode);
     }
+
+    /**
+     * Buat validasinya
+     * 
+     * @param Request $request
+     * @param array $rules
+     * @return Validator
+     */
+    protected function validate(Request $request, array $rules): Validator
+    {
+        return Validator::make($request->all(), $rules);
+    }
 }

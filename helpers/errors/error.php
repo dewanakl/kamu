@@ -13,15 +13,14 @@
         }
 
         #main {
-            display: table;
-            width: 100%;
             height: 100vh;
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .fof {
-            display: table-cell;
-            vertical-align: middle;
+            text-align: center;
         }
 
         .fof h1 {
