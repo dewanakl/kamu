@@ -70,7 +70,7 @@ class Request
     /**
      * Ambil nilai dari request server ini
      *
-     * @param string $name
+     * @param ?string $name
      * @return mixed
      */
     public function server(?string $name = null): mixed
@@ -155,9 +155,16 @@ class Request
      */
     public function validate(array $params = []): array
     {
-        $this->validator = Validator::make($this->all(), $params);
+        $key = array_keys($params);
+
+        $this->validator = Validator::make($this->only($key), $params);
         $this->fails();
-        return $this->validator->validated();
+
+        foreach ($key as $k) {
+            $this->__set($k, $this->validator->get($k));
+        }
+
+        return $this->only($key);
     }
 
     /**

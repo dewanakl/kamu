@@ -46,6 +46,13 @@ class BaseModel implements IteratorAggregate, JsonSerializable
     private $dates;
 
     /**
+     * Primary key tabelnya
+     * 
+     * @var string $primaryKey
+     */
+    private $primaryKey;
+
+    /**
      * Attributes hasil query
      * 
      * @var array $attributes
@@ -154,7 +161,7 @@ class BaseModel implements IteratorAggregate, JsonSerializable
      */
     public function __serialize(): array
     {
-        return [$this->attribute(), $this->table, $this->dates];
+        return [$this->attribute(), $this->table, $this->dates, $this->primaryKey];
     }
 
     /**
@@ -172,11 +179,13 @@ class BaseModel implements IteratorAggregate, JsonSerializable
         $this->attributes = $data[0];
         $this->table = $data[1];
         $this->dates = $data[2];
+        $this->primaryKey = $data[3];
     }
 
     /**
      * Set nama tabelnya
      *
+     * @param string $name
      * @return void
      */
     public function table(string $name): void
@@ -187,11 +196,23 @@ class BaseModel implements IteratorAggregate, JsonSerializable
     /**
      * Set tanggal updatenya
      *
+     * @param array $date
      * @return void
      */
     public function dates(array $date): void
     {
         $this->dates = $date;
+    }
+
+    /**
+     * Set primaryKey
+     *
+     * @param string $primaryKey
+     * @return void
+     */
+    public function primaryKey(string $primaryKey): void
+    {
+        $this->primaryKey = $primaryKey;
     }
 
     /**
@@ -232,7 +253,7 @@ class BaseModel implements IteratorAggregate, JsonSerializable
      */
     public function refresh(): self
     {
-        return $this->find($this->attributes['id']);
+        return $this->find($this->__get($this->primaryKey));
     }
 
     /**
@@ -455,12 +476,12 @@ class BaseModel implements IteratorAggregate, JsonSerializable
      * Cari berdasarkan id
      *
      * @param mixed $id
-     * @param string $where
+     * @param ?string $where
      * @return self
      */
-    public function find(mixed $id, string $where = 'id'): self
+    public function find(mixed $id, ?string $where = null): self
     {
-        return $this->where($where, $id)->limit(1)->first();
+        return $this->where(is_null($where) ? $this->primaryKey : $where, $id)->limit(1)->first();
     }
 
     /**
@@ -503,7 +524,7 @@ class BaseModel implements IteratorAggregate, JsonSerializable
         }
 
         $id = $this->db->lastInsertId();
-        $this->attributes = array_merge($data, ['id' => $id]);
+        $this->attributes = array_merge($data, [$this->primaryKey => $id]);
 
         return $this;
     }

@@ -49,6 +49,7 @@ abstract class Model
         $base = App::get()->make(BaseModel::class);
         $base->table(self::getPropertyChild(get_called_class(), 'table'));
         $base->dates(self::getPropertyChild(get_called_class(), 'dates'));
+        $base->primaryKey(self::getPropertyChild(get_called_class(), 'primaryKey'));
         return App::get()->invoke(BaseModel::class, $method, $parameters);
     }
 

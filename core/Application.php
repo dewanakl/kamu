@@ -20,7 +20,7 @@ class Application
      * 
      * @var array $objectPool
      */
-    private array $objectPool;
+    private $objectPool;
 
     /**
      * Buat objek application

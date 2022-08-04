@@ -27,14 +27,14 @@ class Validator
     /**
      * Init object
      * 
+     * @param array $data
+     * @param array $rule
      * @return void
      */
     function __construct(array $data = [], array $rule = [])
     {
         $this->data = $data;
-        foreach ($rule as $param => $rules) {
-            $this->validateRule($param, $rules);
-        }
+        $this->validate($rule);
     }
 
     /**
@@ -172,6 +172,19 @@ class Validator
     }
 
     /**
+     * Tambahkan validasi lagi jika perlu
+     * 
+     * @param array $rules
+     * @return void
+     */
+    public function validate(array $rules): void
+    {
+        foreach ($rules as $param => $rule) {
+            $this->validateRule($param, $rule);
+        }
+    }
+
+    /**
      * Cek apakah gagal ?
      * 
      * @return bool
@@ -219,7 +232,7 @@ class Validator
      */
     public function validated(): array
     {
-        return $this->data;
+        return $this->get();
     }
 
     /**
@@ -246,13 +259,29 @@ class Validator
     public function except(array $except): array
     {
         $temp = [];
-        foreach ($this->data as $key => $value) {
+        foreach ($this->get() as $key => $value) {
             if (!in_array($key, $except)) {
                 $temp[$key] = $value;
             }
         }
 
         return $temp;
+    }
+
+    /**
+     * Ambil nilai dari data ini
+     *
+     * @param ?string $name
+     * @param mixed $defaultValue
+     * @return mixed
+     */
+    public function get(?string $name = null, mixed $defaultValue = null): mixed
+    {
+        if ($name === null) {
+            return $this->data;
+        }
+
+        return $this->data[$name] ?? $defaultValue;
     }
 
     /**
