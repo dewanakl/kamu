@@ -15,21 +15,21 @@ class Table
      * 
      * @var array $query
      */
-    private array $query = array();
+    private array $query = [];
 
     /**
      * Tipe dbms
      * 
      * @var string $type
      */
-    private string $type;
+    private $type;
 
     /**
      * Nama tabelnya
      * 
      * @var string $table
      */
-    private string $table;
+    private $table;
 
     /**
      * Init objek

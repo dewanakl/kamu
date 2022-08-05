@@ -33,6 +33,16 @@ class Application
     }
 
     /**
+     * Hapus objekpool ketika selesai
+     *
+     * @return void
+     */
+    function __destruct()
+    {
+        $this->objectPool = [];
+    }
+
+    /**
      * Inject pada constructor yang akan di buat objek
      *
      * @param string $name

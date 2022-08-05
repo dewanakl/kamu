@@ -39,7 +39,7 @@ class Router
      * 
      * @var array $middleware
      */
-    private $middleware = [];
+    private array $middleware = [];
 
     /**
      * Jadikan objek tunggal

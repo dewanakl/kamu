@@ -20,6 +20,23 @@ class AuthManager
     private $user;
 
     /**
+     * Object session
+     * 
+     * @var Session $session
+     */
+    private $session;
+
+    /**
+     * Init obejct
+     * 
+     * @return void
+     */
+    function __construct(Session $session)
+    {
+        $this->session = $session;
+    }
+
+    /**
      * Check usernya
      * 
      * @return bool
@@ -44,7 +61,7 @@ class AuthManager
             return $this->user;
         }
 
-        $user = session()->get('_user');
+        $user = $this->session->get('_user');
         if (!empty($user)) {
             $this->user = unserialize(base64_decode($user))->refresh();
         }
@@ -60,7 +77,7 @@ class AuthManager
     public function logout(): void
     {
         $this->user = null;
-        session()->unset('_user');
+        $this->session->unset('_user');
     }
 
     /**
@@ -79,7 +96,7 @@ class AuthManager
 
         $this->logout();
         $this->user = $user;
-        session()->set('_user', base64_encode(serialize($user)));
+        $this->session->set('_user', base64_encode(serialize($user)));
     }
 
     /**
@@ -103,12 +120,12 @@ class AuthManager
 
         if ($user->failFunction(fn () => false) && $password) {
             $this->user = $user;
-            session()->set('_user', base64_encode(serialize($user)));
+            $this->session->set('_user', base64_encode(serialize($user)));
             return true;
         }
 
-        session()->set('old', [$first => $credential[$first]]);
-        session()->set('error', [$first => "$first atau $last salah !"]);
+        $this->session->set('old', [$first => $credential[$first]]);
+        $this->session->set('error', [$first => "$first atau $last salah !"]);
         return false;
     }
 }

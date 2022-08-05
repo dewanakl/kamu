@@ -26,10 +26,31 @@ final class DB
     public static function table(string $name): BaseModel
     {
         if (!(self::$base instanceof BaseModel)) {
-            self::$base = App::get()->singleton(BaseModel::class);
+            self::$base = App::get()->make(BaseModel::class);
         }
 
         self::$base->table($name);
         return self::$base;
+    }
+
+    /**
+     * Mulai transaksinya
+     *
+     * @return bool
+     */
+    public static function beginTransaction(): bool
+    {
+        self::$base = App::get()->make(BaseModel::class);
+        return self::$base->startTransaction();
+    }
+
+    /**
+     * Akhiri transaksinya
+     *
+     * @return bool
+     */
+    public static function endTransaction(): bool
+    {
+        return self::$base->endTransaction();
     }
 }

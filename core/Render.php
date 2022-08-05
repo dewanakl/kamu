@@ -17,21 +17,21 @@ class Render
      * 
      * @var string $path
      */
-    private string $path;
+    private $path;
 
     /**
      * Isi file html
      * 
      * @var string $path
      */
-    private string $content;
+    private $content;
 
     /**
      * Injek variabel
      * 
      * @var array $variables
      */
-    private array $variables;
+    private $variables;
 
     /**
      * Init objek
