@@ -1,7 +1,7 @@
 <?php
 
 use Controllers\WelcomeController;
-use Core\Route;
+use Core\Routing\Route;
 
 /**
  * Make something great with this app

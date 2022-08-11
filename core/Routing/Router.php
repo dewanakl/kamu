@@ -1,6 +1,6 @@
 <?php
 
-namespace Core;
+namespace Core\Routing;
 
 use Closure;
 use Exception;
@@ -9,7 +9,7 @@ use Exception;
  * Class untuk routing dan mengelompokan url
  *
  * @class Router
- * @package Core
+ * @package Core\Routing
  */
 class Router
 {

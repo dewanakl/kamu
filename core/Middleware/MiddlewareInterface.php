@@ -1,9 +1,9 @@
 <?php
 
-namespace Middleware;
+namespace Core\Middleware;
 
 use Closure;
-use Core\Request;
+use Core\Http\Request;
 
 interface MiddlewareInterface
 {

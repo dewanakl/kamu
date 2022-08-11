@@ -8,10 +8,11 @@
 
 return '<?php
 
-use Core\Schema;
-use Core\Table;
+use Core\Database\Migration;
+use Core\Database\Schema;
+use Core\Database\Table;
 
-return new class
+return new class implements Migration
 {
     /**
      * Jalankan migrasi

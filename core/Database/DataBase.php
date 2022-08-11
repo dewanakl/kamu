@@ -1,6 +1,6 @@
 <?php
 
-namespace Core;
+namespace Core\Database;
 
 use Exception;
 use PDO;
@@ -11,7 +11,7 @@ use Throwable;
  * Hubungkan ke database yang ada dengan pdo
  *
  * @class DataBase
- * @package Core
+ * @package Core\Database
  */
 class DataBase
 {

@@ -1,8 +1,9 @@
 <?php
 
+use Core\Database\Generator;
 use Models\User;
 
-return new class
+return new class implements Generator
 {
     /**
      * Generate nilai database

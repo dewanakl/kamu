@@ -1,6 +1,6 @@
 <?php
 
-namespace Core;
+namespace Core\Facades;
 
 use Exception;
 use ReflectionClass;
@@ -8,10 +8,11 @@ use ReflectionException;
 use ReflectionMethod;
 
 /**
- * Aplikasi untuk menampung kumpulan objek yang bisa digunakan kembali
+ * Aplikasi untuk menampung kumpulan objek yang bisa digunakan kembali serta
+ * inject sebuah object kedalam fungsi
  *
  * @class Application
- * @package Core
+ * @package Core\Facades
  */
 class Application
 {

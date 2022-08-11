@@ -1,12 +1,14 @@
 <?php
 
-namespace Core;
+namespace Core\Support;
+
+use Core\View\Render;
 
 /**
  * Kirim email dengan SMTP
  *
  * @class Mail
- * @package Core
+ * @package Core\Support
  * @see https://github.com/snipworks/php-smtp
  */
 class Mail

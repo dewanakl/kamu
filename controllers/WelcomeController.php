@@ -2,7 +2,8 @@
 
 namespace Controllers;
 
-use Core\Controller;
+use Core\Routing\Controller;
+use Core\Http\Request;
 
 class WelcomeController extends Controller
 {

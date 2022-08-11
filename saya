@@ -14,7 +14,7 @@ require_once 'helpers/helpers.php';
  * it's simple
  */
 
-$app = \Core\App::new(new \Core\Application());
+$app = \Core\Facades\App::new(new \Core\Facades\Application());
 
-$console = $app->make(\Core\Console::class, array($argv));
+$console = $app->make(\Core\Support\Console::class, array($argv));
 exit($console->run());

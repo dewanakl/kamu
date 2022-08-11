@@ -1,12 +1,12 @@
 <?php
 
-namespace Core;
+namespace Core\Support;
 
 /**
  * Validasi sebuah nilai
  * 
  * @class Validator
- * @package Core
+ * @package Core\Support
  */
 class Validator
 {
@@ -132,7 +132,7 @@ class Validator
                 case str_contains($rule, 'unik'):
                     $command = explode(':', $rule);
 
-                    $model = '\Models\\' . (empty($command[1]) ? 'User' : ucfirst($command[1]));
+                    $model = 'Models\\' . (empty($command[1]) ? 'User' : ucfirst($command[1]));
                     $column = $command[2] ?? $param;
 
                     $user = app($model)->find($value, $column);

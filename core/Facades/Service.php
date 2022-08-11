@@ -1,17 +1,21 @@
 <?php
 
-namespace Core;
+namespace Core\Facades;
 
+use Core\Http\Request;
+use Core\Http\Respond;
+use Core\Middleware\Middleware;
+use Core\Middleware\MiddlewareInterface;
+use Core\Routing\Router;
 use InvalidArgumentException;
 use Middleware\CorsMiddleware;
 use Middleware\CsrfMiddleware;
-use Middleware\MiddlewareInterface;
 
 /**
  * Class untuk menjalankan middleware dan controller
  *
  * @class Service
- * @package Core
+ * @package Core\Facades
  */
 class Service
 {
@@ -137,7 +141,9 @@ class Service
     public function run(Router $router): void
     {
         $path = urldecode(parse_url($this->request->server('REQUEST_URI'), PHP_URL_PATH));
-        $method = strtoupper($this->request->get('_method', $this->request->method()));
+        $method = strtoupper($this->request->method()) == 'POST'
+            ? strtoupper($this->request->get('_method', 'POST'))
+            : strtoupper($this->request->method());
 
         $routeMatch = false;
         $methodMatch = false;

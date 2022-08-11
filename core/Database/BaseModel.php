@@ -1,9 +1,10 @@
 <?php
 
-namespace Core;
+namespace Core\Database;
 
 use ArrayIterator;
 use Closure;
+use Core\Facades\App;
 use IteratorAggregate;
 use JsonSerializable;
 use ReturnTypeWillChange;
@@ -13,7 +14,7 @@ use Traversable;
  * Simple query builder
  *
  * @class BaseModel
- * @package Core
+ * @package Core\Database
  */
 class BaseModel implements IteratorAggregate, JsonSerializable
 {
@@ -398,6 +399,18 @@ class BaseModel implements IteratorAggregate, JsonSerializable
     }
 
     /**
+     * Offset syntax sql
+     *
+     * @param int $param
+     * @return self
+     */
+    public function offset(int $param): self
+    {
+        $this->query = $this->query . ' OFFSET ' . $param;
+        return $this;
+    }
+
+    /**
      * Select raw syntax sql
      *
      * @param string $param
@@ -410,6 +423,16 @@ class BaseModel implements IteratorAggregate, JsonSerializable
 
         $this->query = str_replace('SELECT * FROM', "SELECT $param FROM", $this->query);
         return $this;
+    }
+
+    /**
+     * Hitung jumlah rownya
+     *
+     * @return int
+     */
+    public function rowCount(): int
+    {
+        return $this->db->rowCount();
     }
 
     /**

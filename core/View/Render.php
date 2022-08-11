@@ -1,6 +1,6 @@
 <?php
 
-namespace Core;
+namespace Core\View;
 
 use InvalidArgumentException;
 
@@ -8,7 +8,7 @@ use InvalidArgumentException;
  * Tampilkan html dan juga injek variabel
  *
  * @class Render
- * @package Core
+ * @package Core\View
  */
 class Render
 {
@@ -38,10 +38,15 @@ class Render
      * 
      * @param string $path
      * @return void
+     * 
+     * @throws InvalidArgumentException
      */
     function __construct(string $path)
     {
-        $this->path = $path;
+        $this->path = __DIR__ . '/../../views/' . $path . '.php';
+        if (!file_exists($this->path)) {
+            throw new InvalidArgumentException(sprintf("Could not show. The file %s could not be found", $this->path));
+        }
     }
 
     /**
@@ -69,22 +74,14 @@ class Render
      * Eksekusi template html
      * 
      * @return void
-     * 
-     * @throws InvalidArgumentException
      */
     public function show(): void
     {
-        $path = __DIR__ . '/../views/' . $this->path . '.php';
-
-        if (!file_exists($path)) {
-            throw new InvalidArgumentException(sprintf("Could not show. The file %s could not be found", $path));
-        }
-
         extract($this->variables, EXTR_SKIP);
 
         ob_start();
 
-        require_once $path;
+        require_once $this->path;
         $this->content = ob_get_contents();
 
         ob_end_clean();

@@ -10,7 +10,7 @@ return '<?php
 
 namespace Models;
 
-use Core\Model;
+use Core\Database\Model;
 
 final class NAME extends Model
 {

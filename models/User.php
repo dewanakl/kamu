@@ -2,7 +2,7 @@
 
 namespace Models;
 
-use Core\Model;
+use Core\Database\Model;
 
 final class User extends Model
 {

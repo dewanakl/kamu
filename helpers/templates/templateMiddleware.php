@@ -11,7 +11,8 @@ return '<?php
 namespace Middleware;
 
 use Closure;
-use Core\Request;
+use Core\Http\Request;
+use Core\Middleware\MiddlewareInterface;
 
 final class NAME implements MiddlewareInterface
 {

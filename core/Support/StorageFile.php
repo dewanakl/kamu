@@ -1,6 +1,8 @@
 <?php
 
-namespace Core;
+namespace Core\Support;
+
+use Core\Http\Request;
 
 class StorageFile
 {

@@ -1,9 +1,9 @@
 <?php
 
-use Core\App;
-use Core\Application;
-use Core\Route;
-use Core\Service;
+use Core\Facades\App;
+use Core\Facades\Application;
+use Core\Facades\Service;
+use Core\Routing\Route;
 
 define('START_TIME', microtime(true));
 

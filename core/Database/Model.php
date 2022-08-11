@@ -1,7 +1,8 @@
 <?php
 
-namespace Core;
+namespace Core\Database;
 
+use Core\Facades\App;
 use Exception;
 use ReflectionClass;
 use ReflectionException;
@@ -10,7 +11,7 @@ use ReflectionException;
  * Representasi model database
  *
  * @class Model
- * @package Core
+ * @package Core\Database
  */
 abstract class Model
 {

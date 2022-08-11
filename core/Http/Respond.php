@@ -1,12 +1,16 @@
 <?php
 
-namespace Core;
+namespace Core\Http;
+
+use Core\Facades\App;
+use Core\Support\Session;
+use Core\View\Render;
 
 /**
  * Respond dari request yang masuk
  *
  * @class Respond
- * @package Core
+ * @package Core\Http
  */
 class Respond
 {

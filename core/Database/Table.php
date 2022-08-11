@@ -1,12 +1,12 @@
 <?php
 
-namespace Core;
+namespace Core\Database;
 
 /**
  * Membuat tabel dengan mudah
  * 
  * @class Table
- * @package Core
+ * @package Core\Database
  */
 class Table
 {
@@ -38,7 +38,7 @@ class Table
      */
     function __construct()
     {
-        $this->type = env('DB_DRIV');
+        $this->type = env('DB_DRIV', 'mysql');
     }
 
     /**
@@ -60,9 +60,9 @@ class Table
     public function export(): string
     {
         $query = 'CREATE TABLE IF NOT EXISTS ' . $this->table . ' (';
-        $query .= join(", ", $this->query);
+        $query .= join(', ', $this->query);
         $query .= ');';
-        $this->query = array();
+        $this->query = [];
 
         return $query;
     }

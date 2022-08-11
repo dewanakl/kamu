@@ -1,12 +1,12 @@
 <?php
 
-namespace Core;
+namespace Core\Routing;
 
 /**
  * Helper class untuk routing url
  *
  * @class Route
- * @package Core
+ * @package Core\Routing
  */
 final class Route
 {

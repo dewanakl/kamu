@@ -10,8 +10,8 @@ return '<?php
 
 namespace Controllers;
 
-use Core\Controller;
-use Core\Request;
+use Core\Routing\Controller;
+use Core\Http\Request;
 
 class NAME extends Controller
 {

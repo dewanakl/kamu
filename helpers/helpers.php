@@ -1,12 +1,12 @@
 <?php
 
-use Core\App;
-use Core\AuthManager;
-use Core\Render;
-use Core\Request;
-use Core\Respond;
-use Core\Route;
-use Core\Session;
+use Core\Facades\App;
+use Core\Auth\AuthManager;
+use Core\View\Render;
+use Core\Http\Request;
+use Core\Http\Respond;
+use Core\Routing\Route;
+use Core\Support\Session;
 
 if (!function_exists('app')) {
     /**

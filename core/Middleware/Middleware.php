@@ -1,14 +1,15 @@
 <?php
 
-namespace Core;
+namespace Core\Middleware;
 
 use Closure;
+use Core\Http\Request;
 
 /**
  * Middleware - cek dahulu sebelum ke controller
  *
  * @class Middleware
- * @package Core
+ * @package Core\Middleware
  * @see https://github.com/esbenp/onion
  */
 class Middleware

@@ -1,14 +1,16 @@
 <?php
 
-namespace Core;
+namespace Core\Auth;
 
+use Core\Database\BaseModel;
+use Core\Support\Session;
 use Exception;
 
 /**
  * Autentikasi user dengan basemodel
  *
  * @class AuthManager
- * @package Core
+ * @package Core\Auth
  */
 class AuthManager
 {
@@ -63,7 +65,7 @@ class AuthManager
 
         $user = $this->session->get('_user');
         if (!empty($user)) {
-            $this->user = unserialize(base64_decode($user))->refresh();
+            $this->user = unserialize($user)->refresh();
         }
 
         return $this->user;
@@ -96,7 +98,7 @@ class AuthManager
 
         $this->logout();
         $this->user = $user;
-        $this->session->set('_user', base64_encode(serialize($user)));
+        $this->session->set('_user', serialize($user));
     }
 
     /**
@@ -109,19 +111,18 @@ class AuthManager
     public function attempt(array $credential, string $model = 'Models\User'): bool
     {
         $data = array_keys($credential);
-
         $first = $data[0];
         $last = $data[1];
 
         $user = app($model)->find($credential[$first], $first);
-        $password = password_verify($credential[$last], $user->$last);
-
         $this->logout();
 
-        if ($user->failFunction(fn () => false) && $password) {
-            $this->user = $user;
-            $this->session->set('_user', base64_encode(serialize($user)));
-            return true;
+        if ($user->failFunction(fn () => false)) {
+            if (password_verify($credential[$last], $user->$last)) {
+                $this->user = $user;
+                $this->session->set('_user', serialize($user));
+                return true;
+            }
         }
 
         $this->session->set('old', [$first => $credential[$first]]);
