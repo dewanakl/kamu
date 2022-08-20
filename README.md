@@ -13,9 +13,9 @@ Kamu adalah framework yang sangat sederhana. Saking sederhananya, dokumentasinya
 
 ## Todo list
 
-- [ x ] Upload file
-- [ x ] Download file
-- [ x ] Validasi file
+- [x] Upload file
+- [x] Download file
+- [x] Validasi file
 - [ ] Security check
 - [ ] API Improvement
 
