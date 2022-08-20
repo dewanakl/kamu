@@ -1,23 +1,17 @@
 <?php
 
-use Core\Facades\App;
-use Core\Facades\Application;
-use Core\Facades\Service;
-use Core\Routing\Route;
-
 define('START_TIME', microtime(true));
 
-require_once __DIR__ . '/../app/app.php';
+require_once __DIR__ . '/../app/Kernel.php';
 
 /** 
- * Create container this application then
+ * Create kernel this web application then
  * Make service object
- * Run route in service object
+ * Run route in service
  * 
  * it's simple
  */
 
-$app = App::new(new Application());
-
-$service = $app->make(Service::class);
-$service->run(Route::router());
+Kernel::web()
+    ->make(\Core\Facades\Service::class)
+    ->run(\Core\Routing\Route::router());

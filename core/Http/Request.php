@@ -2,6 +2,7 @@
 
 namespace Core\Http;
 
+use Core\Support\File;
 use Core\Support\Validator;
 
 /**
@@ -13,7 +14,7 @@ use Core\Support\Validator;
 class Request
 {
     /**
-     * Data dari global var request
+     * Data dari global request
      * 
      * @var array $requestData
      */
@@ -25,13 +26,6 @@ class Request
      * @var array $serverData
      */
     private $serverData;
-
-    /**
-     * Data dari global var files
-     * 
-     * @var array $fileData
-     */
-    private $fileData;
 
     /**
      * Object validator
@@ -47,12 +41,9 @@ class Request
      */
     function __construct()
     {
-        $this->requestData = $_REQUEST;
-        $this->serverData = $_SERVER;
-        $this->fileData = $_FILES;
         $inputRaw = json_decode(file_get_contents('php://input'), true);
-
-        $this->requestData = array_merge($this->requestData, $inputRaw ?? []);
+        $this->requestData = array_merge($_REQUEST, $_FILES, $inputRaw ?? []);
+        $this->serverData = $_SERVER;
     }
 
     /**
@@ -170,18 +161,16 @@ class Request
     }
 
     /**
-     * Ambil nilai dari request file ini
+     * Ambil file yang masuk
      *
-     * @param ?string $name
-     * @return array|object
+     * @param string $name
+     * @return File
      */
-    public function file(?string $name = null): array|object
+    public function file(string $name): File
     {
-        if (!$name) {
-            return $this->fileData;
-        }
-
-        return (object) $this->fileData[$name];
+        $file = new File($this);
+        $file->getFromRequest($name);
+        return $file;
     }
 
     /**

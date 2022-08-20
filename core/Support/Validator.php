@@ -38,7 +38,7 @@ class Validator
     }
 
     /**
-     * Validasi rule request yang masuk
+     * Validasi rule yang masuk
      * 
      * @param string $param
      * @param array $rules
@@ -53,91 +53,177 @@ class Validator
 
             $value = $this->__get($param);
 
+            if (is_array($value)) {
+                $this->validateFile($param, $value, $rule);
+            } else {
+                $this->validateRequest($param, $value, $rule);
+            }
+        }
+    }
+
+    /**
+     * Validasi rule request yang masuk
+     * 
+     * @param string $param
+     * @param mixed $value
+     * @param string $rules
+     * @return void
+     */
+    private function validateRequest(string $param, mixed $value, string $rule): void
+    {
+        switch (true) {
+            case $rule == 'required':
+                if (!$this->__isset($param) || empty($value ? trim($value) : $value)) {
+                    $this->setError($param, 'dibutuhkan !');
+                }
+                break;
+
+            case $rule == 'email':
+                if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                    $this->__set($param, filter_var($value, FILTER_SANITIZE_EMAIL));
+                } else {
+                    $this->setError($param, 'ilegal atau tidak sah !');
+                }
+                break;
+
+            case $rule == 'url':
+                if (filter_var($value, FILTER_VALIDATE_URL)) {
+                    $this->__set($param, filter_var($value, FILTER_SANITIZE_URL));
+                } else {
+                    $this->setError($param, 'ilegal atau tidak sah !');
+                }
+                break;
+
+            case $rule == 'int':
+                if (is_numeric($value)) {
+                    $this->__set($param, intval($value));
+                } else {
+                    $this->setError($param, 'harus angka !');
+                }
+                break;
+
+            case $rule == 'float':
+                if (is_numeric($value)) {
+                    $this->__set($param, floatval($value));
+                } else {
+                    $this->setError($param, 'harus desimal !');
+                }
+                break;
+
+            case $rule == 'str':
+                $this->__set($param, strval($value));
+                break;
+
+            case $rule == 'slug':
+                $this->__set($param, preg_replace('/[^\w-]/', '', $value));
+                break;
+
+            case $rule == 'hash':
+                $this->__set($param, password_hash($value, PASSWORD_BCRYPT));
+                break;
+
+            case $rule == 'trim':
+                $this->__set($param, $value ? trim($value) : $value);
+                break;
+
+            case str_contains($rule, 'min'):
+                $min = explode(':', $rule)[1];
+                if (strlen($value) < $min) {
+                    $this->setError($param, 'panjang minimal', $min);
+                }
+                break;
+
+            case str_contains($rule, 'max'):
+                $max = explode(':', $rule)[1];
+                if (strlen($value) > $max) {
+                    $this->setError($param, 'panjang maximal', $max);
+                }
+                break;
+
+            case str_contains($rule, 'sama'):
+                $target = explode(':', $rule)[1];
+                if ($this->__get($target) != $value) {
+                    $this->setError($param, 'tidak sama dengan', $target);
+                }
+                break;
+
+            case str_contains($rule, 'unik'):
+                $command = explode(':', $rule);
+
+                $model = 'Models\\' . (empty($command[1]) ? 'User' : ucfirst($command[1]));
+                $column = $command[2] ?? $param;
+
+                $user = app($model)->find($value, $column);
+                if ($user->$column) {
+                    $this->setError($param, 'sudah ada !');
+                }
+                break;
+        }
+    }
+
+    /**
+     * Validasi rule file yang masuk
+     * 
+     * @param string $param
+     * @param mixed $value
+     * @param string $rules
+     * @return void
+     */
+    private function validateFile(string $param, mixed $value, string $rule): void
+    {
+        $error = array(
+            0 => false,
+            1 => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
+            2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
+            3 => 'The uploaded file was only partially uploaded',
+            4 => false,
+            6 => 'Missing a temporary folder',
+            7 => 'Failed to write file to disk.',
+            8 => 'A PHP extension stopped the file upload.',
+        );
+
+        $err = $error[$value['error']];
+        if ($err) {
+            @unlink($value['tmp_name']);
+            $this->setError($param, $err);
+        } else {
             switch (true) {
                 case $rule == 'required':
-                    if (!$this->__isset($param) || empty($value ? trim($value) : $value)) {
+                    if ($value['error'] == 4 || $value['size'] == 0 || empty($value['name'])) {
+                        @unlink($value['tmp_name']);
                         $this->setError($param, 'dibutuhkan !');
                     }
                     break;
 
-                case $rule == 'email':
-                    if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                        $this->__set($param, filter_var($value, FILTER_SANITIZE_EMAIL));
-                    } else {
-                        $this->setError($param, 'ilegal atau tidak sah !');
-                    }
-                    break;
-
-                case $rule == 'url':
-                    if (filter_var($value, FILTER_VALIDATE_URL)) {
-                        $this->__set($param, filter_var($value, FILTER_SANITIZE_URL));
-                    } else {
-                        $this->setError($param, 'ilegal atau tidak sah !');
-                    }
-                    break;
-
-                case $rule == 'int':
-                    if (is_numeric($value)) {
-                        $this->__set($param, intval($value));
-                    } else {
-                        $this->setError($param, 'harus angka !');
-                    }
-                    break;
-
-                case $rule == 'float':
-                    if (is_numeric($value)) {
-                        $this->__set($param, floatval($value));
-                    } else {
-                        $this->setError($param, 'harus desimal !');
-                    }
-                    break;
-
-                case $rule == 'str':
-                    $this->__set($param, strval($value));
-                    break;
-
-                case $rule == 'slug':
-                    $this->__set($param, preg_replace('/[^\w-]/', '', $value));
-                    break;
-
-                case $rule == 'hash':
-                    $this->__set($param, password_hash($value, PASSWORD_BCRYPT));
-                    break;
-
-                case $rule == 'trim':
-                    $this->__set($param, $value ? trim($value) : $value);
-                    break;
-
                 case str_contains($rule, 'min'):
-                    $min = explode(':', $rule)[1];
-                    if (strlen($value) < $min) {
-                        $this->setError($param, 'panjang minimal', $min);
+                    $min = explode(':', $rule)[1] * 1024;
+                    if ($value['size'] < $min) {
+                        @unlink($value['tmp_name']);
+                        $this->setError($param, 'ukuran minimal', formatBytes($min));
                     }
                     break;
 
                 case str_contains($rule, 'max'):
-                    $max = explode(':', $rule)[1];
-                    if (strlen($value) > $max) {
-                        $this->setError($param, 'panjang maximal', $max);
+                    $max = explode(':', $rule)[1] * 1024;
+                    if ($value['size'] > $max) {
+                        @unlink($value['tmp_name']);
+                        $this->setError($param, 'ukuran maximal', formatBytes($max));
                     }
                     break;
 
-                case str_contains($rule, 'sama'):
-                    $target = explode(':', $rule)[1];
-                    if ($this->__get($target) != $value) {
-                        $this->setError($param, 'tidak sama dengan', $target);
+                case str_contains($rule, 'mimetypes'):
+                    $mime = explode(':', $rule)[1];
+                    if (!in_array($value['type'], explode(',', $mime))) {
+                        @unlink($value['tmp_name']);
+                        $this->setError($param, 'diperbolehkan', $mime);
                     }
                     break;
 
-                case str_contains($rule, 'unik'):
-                    $command = explode(':', $rule);
-
-                    $model = 'Models\\' . (empty($command[1]) ? 'User' : ucfirst($command[1]));
-                    $column = $command[2] ?? $param;
-
-                    $user = app($model)->find($value, $column);
-                    if ($user->$column) {
-                        $this->setError($param, 'sudah ada !');
+                case str_contains($rule, 'mimes'):
+                    $mime = explode(':', $rule)[1];
+                    if (!in_array(pathinfo($value['full_path'], PATHINFO_EXTENSION), explode(',', $mime))) {
+                        @unlink($value['tmp_name']);
+                        $this->setError($param, 'diperbolehkan', $mime);
                     }
                     break;
             }

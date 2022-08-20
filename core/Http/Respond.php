@@ -153,6 +153,11 @@ class Respond
             }
         }
 
+        if ($respond instanceof Stream) {
+            $respond->process();
+            $this->terminate();
+        }
+
         if (!is_null($respond)) {
             dd($respond);
         }

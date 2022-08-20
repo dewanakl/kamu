@@ -402,6 +402,23 @@ if (!function_exists('now')) {
     }
 }
 
+if (!function_exists('formatBytes')) {
+    /**
+     * Dapatkan format ukuran bytes yang mudah dibaca
+     * 
+     * @param int $size
+     * @param int $precision
+     * @return string
+     */
+    function formatBytes(int $size, int $precision = 2): string
+    {
+        $base = log($size, 1024);
+        $suffixes = ['Byte', 'Kb', 'Mb', 'Gb', 'Tb'];
+
+        return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
+    }
+}
+
 if (!function_exists('getPageTime')) {
     /**
      * Dapatkan waktu yang dibutuhkan untuk merender halaman

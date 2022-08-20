@@ -56,7 +56,7 @@ class Router
     public static function self(): Router
     {
         if (!(self::$self instanceof Router)) {
-            self::$self = new self;
+            self::$self = new self();
         }
 
         return self::$self;
