@@ -2,7 +2,6 @@
 
 namespace Core\Http;
 
-use Core\Facades\App;
 use Core\Support\Session;
 use Core\View\Render;
 
@@ -106,10 +105,7 @@ class Respond
      */
     public function view(string $view, array $param = []): Render
     {
-        $template = App::get()->make(Render::class, array($view));
-        $template->setData($param);
-        $template->show();
-        return $template;
+        return show($view, $param, false);
     }
 
     /**

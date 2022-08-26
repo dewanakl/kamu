@@ -44,9 +44,20 @@ class Render
     function __construct(string $path)
     {
         $this->path = __DIR__ . '/../../views/' . $path . '.php';
+
         if (!file_exists($this->path)) {
-            throw new InvalidArgumentException(sprintf("Could not show. The file %s could not be found", $this->path));
+            throw new InvalidArgumentException(sprintf('File "%s" gk adaa', $path . '.php'));
         }
+    }
+
+    /**
+     * Magic hapus object
+     * 
+     * @return void
+     */
+    function __destruct()
+    {
+        $this->reset();
     }
 
     /**
@@ -56,7 +67,21 @@ class Render
      */
     function __toString()
     {
-        return $this->content;
+        $content = $this->content;
+        $this->reset();
+        return $content;
+    }
+
+    /**
+     * Hapus attribute
+     * 
+     * @return void
+     */
+    private function reset(): void
+    {
+        $this->path = null;
+        $this->content = null;
+        $this->variables = [];
     }
 
     /**
@@ -81,7 +106,7 @@ class Render
 
         ob_start();
 
-        require_once $this->path;
+        include_once $this->path;
         $this->content = ob_get_contents();
 
         ob_end_clean();

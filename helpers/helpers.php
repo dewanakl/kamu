@@ -72,7 +72,7 @@ if (!function_exists('show')) {
      */
     function show(string $view, array $param = [], bool $echo = true): mixed
     {
-        $template = app()->make(Render::class, array($view));
+        $template = new Render($view);
         $template->setData($param);
         $template->show();
 
