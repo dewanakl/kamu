@@ -2,6 +2,8 @@
 
 namespace Core\Database;
 
+use Closure;
+
 /**
  * Membuat tabel dengan mudah
  * 
@@ -32,6 +34,13 @@ class Table
     private $table;
 
     /**
+     * Alter tabelnya
+     * 
+     * @var string $alter
+     */
+    private $alter;
+
+    /**
      * Init objek
      *
      * @return void
@@ -53,16 +62,32 @@ class Table
     }
 
     /**
+     * Create table sql
+     * 
+     * @return string
+     */
+    public function create(): string
+    {
+        $query = 'CREATE TABLE IF NOT EXISTS ' . $this->table . ' (';
+        $query .= join(', ', $this->query);
+        $query .= ');';
+        $this->query = [];
+
+        return $query;
+    }
+
+    /**
      * Export hasilnya ke string sql
      * 
      * @return string
      */
     public function export(): string
     {
-        $query = 'CREATE TABLE IF NOT EXISTS ' . $this->table . ' (';
-        $query .= join(', ', $this->query);
-        $query .= ');';
+        $query = 'ALTER TABLE ' . $this->table . ' ';
+        $query .= join(', ', array_map(fn ($data) => $this->alter . ' ' . $data, $this->query));
+        $query .= ';';
         $this->query = [];
+        $this->alter = null;
 
         return $query;
     }
@@ -90,17 +115,6 @@ class Table
         } else {
             $this->query[] = "$name INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT";
         }
-    }
-
-    /**
-     * Int non primary key
-     * 
-     * @param string $name
-     * @return void
-     */
-    public function unsignedInteger(string $name): void
-    {
-        $this->query[] = "$name INT NOT NULL";
     }
 
     /**
@@ -220,7 +234,7 @@ class Table
      */
     public function foreign(string $name): self
     {
-        $this->query[] = "CONSTRAINT FK_{$this->table}_$name FOREIGN KEY($name)";
+        $this->query[] = 'CONSTRAINT FK_' . $this->table . "_$name FOREIGN KEY($name)";
         return $this;
     }
 
@@ -256,5 +270,42 @@ class Table
     public function cascadeOnDelete(): void
     {
         $this->query[$this->getLastArray()] = end($this->query) . ' ON DELETE CASCADE';
+    }
+
+    /**
+     * Tambahkan kolom baru
+     * 
+     * @param Closure $fn
+     * @return void
+     */
+    public function addColumn(Closure $fn): void
+    {
+        $this->alter = 'ADD';
+        $fn($this);
+    }
+
+    /**
+     * Hapus kolom
+     * 
+     * @param string $name
+     * @return void
+     */
+    public function dropColumn(string $name): void
+    {
+        $this->alter = 'DROP';
+        $this->query[$this->getLastArray()] = 'COLUMN ' . $name;
+    }
+
+    /**
+     * Rename kolom
+     * 
+     * @param string $from
+     * @param string $to
+     * @return void
+     */
+    public function renameColumn(string $from, string $to): void
+    {
+        $this->alter = 'RENAME';
+        $this->query[$this->getLastArray()] = $from . ' TO ' . $to;
     }
 }

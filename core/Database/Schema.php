@@ -3,7 +3,6 @@
 namespace Core\Database;
 
 use Closure;
-use Core\Facades\App;
 
 /**
  * Helper class untuk skema tabel
@@ -22,11 +21,27 @@ final class Schema
      */
     public static function create(string $name, Closure $attribute): void
     {
-        $table = App::get()->singleton(Table::class);
+        $table = app(Table::class);
         $table->table($name);
         $attribute($table);
 
-        App::get()->singleton(DataBase::class)->exec($table->export());
+        app(DataBase::class)->exec($table->create());
+    }
+
+    /**
+     * Bikin tabel baru
+     *
+     * @param string $name
+     * @param Closure $attribute
+     * @return void
+     */
+    public static function table(string $name, Closure $attribute): void
+    {
+        $table = app(Table::class);
+        $table->table($name);
+        $attribute($table);
+
+        app(DataBase::class)->exec($table->export());
     }
 
     /**
@@ -37,6 +52,18 @@ final class Schema
      */
     public static function drop(string $name): void
     {
-        App::get()->singleton(DataBase::class)->exec('DROP TABLE IF EXISTS ' . $name . ';');
+        app(DataBase::class)->exec('DROP TABLE IF EXISTS ' . $name . ';');
+    }
+
+    /**
+     * Rename tabelnya
+     *
+     * @param string $from
+     * @param string $to
+     * @return void
+     */
+    public static function rename(string $from, string $to): void
+    {
+        app(DataBase::class)->exec('ALTER TABLE ' . $from . ' RENAME TO ' . $to . ';');
     }
 }
