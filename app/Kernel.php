@@ -105,7 +105,7 @@ class Kernel
     {
         $self = new self();
 
-        define('HTTPS', ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || intval($_SERVER['SERVER_PORT']) == 443) ? 'https://' : 'http://');
+        define('HTTPS', ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || intval($_SERVER['SERVER_PORT']) == 443 || @$_ENV['HTTPS']) ? 'https://' : 'http://');
         define('BASEURL', @$_ENV['BASEURL'] ? rtrim($_ENV['BASEURL'], '/') : HTTPS . $_SERVER['HTTP_HOST']);
         define('DEBUG', (@$_ENV['DEBUG'] == 'true') ? true : false);
 
