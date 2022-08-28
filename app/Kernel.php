@@ -26,6 +26,7 @@ class Kernel
         $this->loader();
         $this->app = new \Core\Facades\Application();
         $this->setEnv();
+        date_default_timezone_set(@$_ENV['TIMEZONE'] ?? 'Asia/Jakarta');
     }
 
     /**
@@ -109,7 +110,6 @@ class Kernel
         define('DEBUG', (@$_ENV['DEBUG'] == 'true') ? true : false);
 
         error_reporting(DEBUG ? E_ALL : 0);
-        date_default_timezone_set(@$_ENV['TIMEZONE'] ?? 'Asia/Jakarta');
 
         session_name(@$_ENV['APP_NAME'] ?? 'Kamu');
         session_set_cookie_params([

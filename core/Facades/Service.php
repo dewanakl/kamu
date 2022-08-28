@@ -5,7 +5,6 @@ namespace Core\Facades;
 use Core\Http\Request;
 use Core\Http\Respond;
 use Core\Middleware\Middleware;
-use Core\Middleware\MiddlewareInterface;
 use Core\Routing\Router;
 use InvalidArgumentException;
 use Middleware\CorsMiddleware;
@@ -34,13 +33,6 @@ class Service
     private $respond;
 
     /**
-     * Objek app disini
-     * 
-     * @var Application $app
-     */
-    private $app;
-
-    /**
      * Buat objek service
      *
      * @param Request $request
@@ -51,7 +43,6 @@ class Service
     {
         $this->request = $request;
         $this->respond = $respond;
-        $this->app = App::get();
     }
 
     /**
@@ -64,22 +55,14 @@ class Service
      */
     private function invokeMiddleware(array $route): void
     {
-        $middlewarePool = [];
+        $middlewares = array_merge([
+            CorsMiddleware::class,
+            CsrfMiddleware::class
+        ], $route['middleware']);
 
-        $middlewarePool[] = $this->app->make(CorsMiddleware::class);
-        $middlewarePool[] = $this->app->make(CsrfMiddleware::class);
+        $middlewarePool = array_map(fn (string $middleware) => new $middleware(), $middlewares);
 
-        foreach ($route['middleware'] as $middleware) {
-            $layer = $this->app->make($middleware);
-
-            if (!($layer instanceof MiddlewareInterface)) {
-                throw new InvalidArgumentException(get_class($layer) . ' bukan middleware');
-            }
-
-            $middlewarePool[] = $layer;
-        }
-
-        $middleware = $this->app->make(Middleware::class, array($middlewarePool));
+        $middleware = new Middleware($middlewarePool);
         $middleware->handle($this->request);
     }
 
@@ -101,7 +84,7 @@ class Service
             $method = '__invoke';
         }
 
-        $this->respond->send($this->app->invoke($controller, $method, $variables));
+        $this->respond->send(App::get()->invoke($controller, $method, $variables));
     }
 
     /**
@@ -140,15 +123,16 @@ class Service
      */
     public function run(Router $router): void
     {
+        $routes = $router->routes();
         $path = urldecode(parse_url($this->request->server('REQUEST_URI'), PHP_URL_PATH));
-        $method = strtoupper($this->request->method()) == 'POST'
-            ? strtoupper($this->request->get('_method', 'POST'))
-            : strtoupper($this->request->method());
+        $method = strtoupper(strtoupper($this->request->method()) == 'POST'
+            ? $this->request->get('_method', 'POST')
+            : $this->request->method());
 
         $routeMatch = false;
         $methodMatch = false;
 
-        foreach ($router->routes() as $route) {
+        foreach ($routes as $route) {
             $pattern = '#^' . $route['path'] . '$#';
             if (preg_match($pattern, $path, $variables)) {
                 $routeMatch = true;

@@ -2,8 +2,6 @@
 
 namespace Core\Database;
 
-use Core\Facades\App;
-
 /**
  * Helper class DB untuk custome nama table
  *
@@ -28,7 +26,7 @@ final class DB
     public static function table(string $name): BaseModel
     {
         if (!(self::$base instanceof BaseModel)) {
-            self::$base = App::get()->make(BaseModel::class);
+            self::$base = new BaseModel();
         }
 
         self::$base->table($name);
@@ -42,7 +40,7 @@ final class DB
      */
     public static function beginTransaction(): bool
     {
-        self::$base = App::get()->make(BaseModel::class);
+        self::$base = new BaseModel();
         return self::$base->startTransaction();
     }
 
