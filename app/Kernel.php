@@ -105,8 +105,8 @@ class Kernel
     {
         $self = new self();
 
-        define('HTTPS', ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || intval($_SERVER['SERVER_PORT']) == 443 || @$_ENV['HTTPS']) ? 'https://' : 'http://');
-        define('BASEURL', @$_ENV['BASEURL'] ? rtrim($_ENV['BASEURL'], '/') : HTTPS . $_SERVER['HTTP_HOST']);
+        define('HTTPS', ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443 || @$_ENV['HTTPS']));
+        define('BASEURL', @$_ENV['BASEURL'] ? rtrim($_ENV['BASEURL'], '/') : (HTTPS ? 'https://' : 'http://') . $_SERVER['HTTP_HOST']);
         define('DEBUG', (@$_ENV['DEBUG'] == 'true') ? true : false);
 
         error_reporting(DEBUG ? E_ALL : 0);
@@ -115,7 +115,7 @@ class Kernel
         session_set_cookie_params([
             'lifetime' => intval(@$_ENV['COOKIE_LIFETIME'] ?? 86400),
             'path' => '/',
-            'secure' => (HTTPS == 'https://') ? true : false,
+            'secure' => HTTPS,
             'httponly' => true,
             'samesite' => 'strict',
         ]);
