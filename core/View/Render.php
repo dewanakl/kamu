@@ -51,16 +51,6 @@ class Render
     }
 
     /**
-     * Magic hapus object
-     * 
-     * @return void
-     */
-    function __destruct()
-    {
-        $this->reset();
-    }
-
-    /**
      * Magic to string
      * 
      * @return string
@@ -68,20 +58,12 @@ class Render
     function __toString()
     {
         $content = $this->content;
-        $this->reset();
-        return $content;
-    }
 
-    /**
-     * Hapus attribute
-     * 
-     * @return void
-     */
-    private function reset(): void
-    {
         $this->path = null;
         $this->content = null;
         $this->variables = [];
+
+        return $content;
     }
 
     /**
