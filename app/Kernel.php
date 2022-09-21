@@ -107,24 +107,15 @@ class Kernel
 
         define('HTTPS', ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443 || @$_ENV['HTTPS']));
         define('BASEURL', @$_ENV['BASEURL'] ? rtrim($_ENV['BASEURL'], '/') : (HTTPS ? 'https://' : 'http://') . $_SERVER['HTTP_HOST']);
-        define('DEBUG', (@$_ENV['DEBUG'] == 'true') ? true : false);
+        define('DEBUG', @$_ENV['DEBUG'] == 'true');
 
         error_reporting(DEBUG ? E_ALL : 0);
-
-        session_name(@$_ENV['APP_NAME'] ?? 'Kamu');
-        session_set_cookie_params([
-            'lifetime' => intval(@$_ENV['COOKIE_LIFETIME'] ?? 86400),
-            'path' => '/',
-            'secure' => HTTPS,
-            'httponly' => true,
-            'samesite' => 'strict',
-        ]);
-
-        require_once __DIR__ . '/../routes/routes.php';
         $self->helper();
 
         set_exception_handler(function (\Throwable $error) {
             header('Content-Type: text/html');
+            @ob_end_clean();
+
             if (!DEBUG) {
                 unavailable();
             }
@@ -132,6 +123,12 @@ class Kernel
             header('HTTP/1.1 500 Internal Server Error');
             show('../helpers/errors/trace', compact('error'));
         });
+
+        if (!env('APP_KEY')) {
+            throw new \Exception('App Key gk ada !');
+        }
+
+        require_once __DIR__ . '/../routes/routes.php';
 
         return $self->app();
     }

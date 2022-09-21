@@ -6,7 +6,7 @@ use Core\View\Render;
 use Core\Http\Request;
 use Core\Http\Respond;
 use Core\Routing\Route;
-use Core\Support\Session;
+use Core\Http\Session;
 
 if (!function_exists('app')) {
     /**
@@ -61,28 +61,38 @@ if (!function_exists('auth')) {
     }
 }
 
+if (!function_exists('extend')) {
+    /**
+     * Baca dari view serta masih bentuk object
+     * 
+     * @param string $path
+     * @param array $data
+     * @return Render
+     */
+    function extend(string $path, array $data = []): Render
+    {
+        $template = new Render($path);
+        $template->setData($data);
+        $template->show();
+
+        return $template;
+    }
+}
+
 if (!function_exists('show')) {
     /**
      * Tampikan hasil dari template html
      * 
-     * @param string $view
-     * @param array $param
-     * @param bool $echo
-     * @return mixed
+     * @param string $path
+     * @param array $data
+     * @return void
      */
-    function show(string $view, array $param = [], bool $echo = true): mixed
+    function show(string $path, array $data = []): void
     {
-        $template = new Render($view);
-        $template->setData($param);
-        $template->show();
-
-        if (!$echo) {
-            return $template;
-        }
+        $template = extend($path, $data);
 
         @ob_end_clean();
         echo $template;
-        return null;
     }
 }
 
@@ -197,20 +207,6 @@ if (!function_exists('unavailable')) {
     }
 }
 
-if (!function_exists('extend')) {
-    /**
-     * Sambungkan beberapa html
-     * 
-     * @param string $path
-     * @param array $data
-     * @return Render
-     */
-    function extend(string $path, array $data = []): Render
-    {
-        return show($path, $data, false);
-    }
-}
-
 if (!function_exists('csrf_token')) {
     /**
      * Ambil csrf token dari session
@@ -219,7 +215,7 @@ if (!function_exists('csrf_token')) {
      */
     function csrf_token(): string
     {
-        return session()->get('token');
+        return session()->get('_token');
     }
 }
 
@@ -317,7 +313,7 @@ if (!function_exists('old')) {
     function old(string $param): mixed
     {
         $old = session()->get('old');
-        return e($old[$param] ?? null);
+        return e($old[$param] ?? '');
     }
 }
 
@@ -415,7 +411,7 @@ if (!function_exists('formatBytes')) {
         $base = log($size, 1024);
         $suffixes = ['Byte', 'Kb', 'Mb', 'Gb', 'Tb'];
 
-        return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
+        return (string) round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
     }
 }
 
@@ -427,7 +423,6 @@ if (!function_exists('getPageTime')) {
      */
     function getPageTime(): string
     {
-        $time = floor(number_format(microtime(true) - START_TIME, 3, ''));
-        return 'This page was generated in ' . $time . ' ms.';
+        return (string) floor(number_format(microtime(true) - START_TIME, 3, ''));
     }
 }
