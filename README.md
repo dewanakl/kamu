@@ -5,17 +5,15 @@ Kamu adalah framework yang sangat sederhana. Saking sederhananya, dokumentasinya
 > Intinya mirip dengan laravel, karena terinspirasi darinya
 
 ## How to run ?
-
+- `clone or download this repository`
 - `cp .env.example .env`
+- `php saya key`
 - `php saya coba`
 
 > Simple bukan ? hehee
 
 ## Todo list
 
-- [x] Upload file
-- [x] Download file
-- [x] Validasi file
 - [ ] Security check
 - [ ] API Improvement
 
