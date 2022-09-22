@@ -49,7 +49,7 @@ class Session
         }
 
         if (is_null($this->get('_token'))) {
-            $this->set('_token', Hash::rand(16));
+            $this->set('_token', Hash::rand(20));
         }
     }
 
