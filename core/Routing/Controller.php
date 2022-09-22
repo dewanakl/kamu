@@ -4,7 +4,7 @@ namespace Core\Routing;
 
 use Core\Http\Request;
 use Core\Http\Respond;
-use Core\Support\Validator;
+use Core\Valid\Validator;
 use Core\View\Render;
 
 /**
@@ -18,13 +18,13 @@ abstract class Controller
     /**
      * Render template html
      *
-     * @param string $view
-     * @param array $param
+     * @param string $path
+     * @param array $data
      * @return Render
      */
-    protected function view(string $view, array $param = []): Render
+    protected function view(string $path, array $data = []): Render
     {
-        return app(Respond::class)->view($view, $param);
+        return extend($path, $data);
     }
 
     /**
@@ -46,18 +46,6 @@ abstract class Controller
     protected function back(): Respond
     {
         return app(Respond::class)->back();
-    }
-
-    /**
-     * Ubah ke json
-     *
-     * @param mixed $data
-     * @param int $statusCode
-     * @return string|false
-     */
-    protected function json(mixed $data, int $statusCode = 200): string|false
-    {
-        return app(Respond::class)->json($data, $statusCode);
     }
 
     /**

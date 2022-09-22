@@ -18,28 +18,28 @@ class Router
      * 
      * @var array $routes
      */
-    private array $routes = [];
+    private $routes;
 
     /**
      * Jika ada controller grup
      * 
      * @var string|null $controller
      */
-    private $controller = null;
+    private $controller;
 
     /**
      * Jika ada prefix grup
      * 
      * @var string|null $prefix
      */
-    private $prefix = null;
+    private $prefix;
 
     /**
      * Untuk middleware group
      * 
      * @var array $middleware
      */
-    private array $middleware = [];
+    private $middleware;
 
     /**
      * Jadikan objek tunggal
@@ -47,6 +47,17 @@ class Router
      * @var Router $self
      */
     private static $self;
+
+    /**
+     * Init object
+     * 
+     * @return void
+     */
+    function __construct()
+    {
+        $this->routes = [];
+        $this->middleware = [];
+    }
 
     /**
      * Buat objek yang tunggal

@@ -13,19 +13,19 @@ trait HasToken
      */
     protected function checkToken(string $token, bool $ajax = false): void
     {
-        if (!hash_equals(session()->get('token'), $token)) {
-            session()->unset('token');
-            respond()->httpCode(400);
+        if (!hash_equals(session()->get('_token'), $token)) {
+            session()->unset('_token');
+            session()->send();
 
             if (!$ajax) {
                 pageExpired();
             }
 
-            respond()->terminate(respond()->json(['token' => false], 400));
+            respond()->terminate(json(['token' => false], 400));
         }
 
         if (!$ajax) {
-            session()->unset('token');
+            session()->unset('_token');
         }
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Core\Support;
 
+use Core\Valid\Hash;
+
 /**
  * Saya console untuk mempermudah develop app
  *
@@ -240,6 +242,10 @@ class Console
                 'description' => 'Jalankan php dengan virtual server'
             ],
             [
+                'command' => 'key',
+                'description' => 'Amankan aplikasi ini dengan kunci random'
+            ],
+            [
                 'command' => 'migrasi',
                 'description' => 'Bikin tabel didatabase kamu [--gen]'
             ],
@@ -282,6 +288,33 @@ class Console
     }
 
     /**
+     * Create key to env file
+     *
+     * @return void
+     */
+    private function createKey(): void
+    {
+        $env = __DIR__ . '/../../.env';
+        if (!file_exists($env)) {
+            $this->exception('env tidak ada !');
+        }
+
+        $lines = file($env, FILE_IGNORE_NEW_LINES);
+        foreach ($lines as $id => $line) {
+            if (str_contains($line, 'APP_KEY=')) {
+                $lines[$id] = 'APP_KEY=' . Hash::rand(6) . ':' . Hash::rand(8);
+                break;
+            }
+        }
+
+        $myfile = fopen($env, 'w');
+        fwrite($myfile, join("\n", $lines));
+        fclose($myfile);
+
+        print("\nAplikasi aman !" . $this->createColor('green', ' berhasil ') . $this->executeTime());
+    }
+
+    /**
      * Jalankan console
      *
      * @return int
@@ -292,6 +325,9 @@ class Console
             case 'coba':
                 $location = ($this->options) ? $this->options : 'localhost';
                 shell_exec("php -S $location:8000 -t public");
+                break;
+            case 'key':
+                $this->createKey();
                 break;
             case 'migrasi':
                 $this->migrasi();

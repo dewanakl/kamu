@@ -3,7 +3,8 @@
 namespace Core\Auth;
 
 use Core\Database\BaseModel;
-use Core\Support\Session;
+use Core\Http\Session;
+use Core\Valid\Hash;
 use Exception;
 
 /**
@@ -17,7 +18,7 @@ class AuthManager
     /**
      * Object basemodel
      * 
-     * @var BaseModel $user
+     * @var BaseModel|null $user
      */
     private $user;
 
@@ -31,6 +32,7 @@ class AuthManager
     /**
      * Init obejct
      * 
+     * @param Session $session
      * @return void
      */
     function __construct(Session $session)
@@ -46,7 +48,7 @@ class AuthManager
     public function check(): bool
     {
         $user = $this->user();
-        return is_null($user) ? false : !empty($user->failFunction(function () {
+        return is_null($user) ? false : !empty($user->fail(function () {
             $this->logout();
             return false;
         }));
@@ -110,15 +112,13 @@ class AuthManager
      */
     public function attempt(array $credential, string $model = 'Models\User'): bool
     {
-        $data = array_keys($credential);
-        $first = $data[0];
-        $last = $data[1];
+        list($first, $last) = array_keys($credential);
 
         $user = app($model)->find($credential[$first], $first);
         $this->logout();
 
-        if ($user->failFunction(fn () => false)) {
-            if (password_verify($credential[$last], $user->$last)) {
+        if ($user->fail(fn () => false)) {
+            if (Hash::check($credential[$last], $user->$last)) {
                 $this->user = $user;
                 $this->session->set('_user', serialize($user));
                 return true;

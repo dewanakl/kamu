@@ -2,7 +2,6 @@
 
 namespace Core\Http;
 
-use Core\Support\Session;
 use Core\View\Render;
 
 /**
@@ -13,13 +12,6 @@ use Core\View\Render;
  */
 class Respond
 {
-    /**
-     * Request obj
-     * 
-     * @var Request $request
-     */
-    private $request;
-
     /**
      * Session obj
      * 
@@ -37,13 +29,11 @@ class Respond
     /**
      * Init objek
      * 
-     * @param Request $request
      * @param Session $session
      * @return void
      */
-    function __construct(Request $request, Session $session)
+    function __construct(Session $session)
     {
-        $this->request = $request;
         $this->session = $session;
     }
 
@@ -79,33 +69,7 @@ class Respond
      */
     public function back(): self
     {
-        return $this->to($this->session->get('oldRoute', '/'));
-    }
-
-    /**
-     * Ubah ke json
-     * 
-     * @param mixed $data
-     * @param int $statusCode 
-     * @return string|false
-     */
-    public function json(mixed $data, int $statusCode = 200): string|false
-    {
-        $this->httpCode($statusCode);
-        header('Content-Type: application/json');
-        return json_encode($data);
-    }
-
-    /**
-     * Tampilkan html
-     * 
-     * @param string $view
-     * @param array $param
-     * @return Render
-     */
-    public function view(string $view, array $param = []): Render
-    {
-        return show($view, $param, false);
+        return $this->to($this->session->get('_oldroute', '/'));
     }
 
     /**
@@ -116,11 +80,13 @@ class Respond
      */
     public function redirect(string $uri): void
     {
-        $this->session->unset('token');
+        $this->session->unset('_token');
+        $this->session->send();
+
         $uri = str_contains($uri, BASEURL) ? $uri : BASEURL . $uri;
 
-        $this->httpCode(302);
-        header('HTTP/1.1 302 Found');
+        http_response_code(302);
+        header('HTTP/1.1 302 Found', true, 302);
         header('Location: ' . $uri, true, 302);
         $this->terminate();
     }
@@ -135,11 +101,12 @@ class Respond
     {
         if (is_string($respond) || $respond instanceof Render) {
             if ($respond instanceof Render) {
-                $this->session->set('oldRoute', $this->request->server('REQUEST_URI'));
+                $this->session->set('_oldroute', app(Request::class)->server('REQUEST_URI'));
                 $this->session->unset('old');
                 $this->session->unset('error');
             }
 
+            $this->session->send();
             $this->terminate($respond);
         }
 
@@ -172,16 +139,5 @@ class Respond
         }
 
         exit;
-    }
-
-    /**
-     * Respon kode
-     * 
-     * @param int $code
-     * @return void
-     */
-    public function httpCode(int $code): void
-    {
-        http_response_code($code);
     }
 }

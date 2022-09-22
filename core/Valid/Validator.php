@@ -1,12 +1,12 @@
 <?php
 
-namespace Core\Support;
+namespace Core\Valid;
 
 /**
  * Validasi sebuah nilai
  * 
  * @class Validator
- * @package Core\Support
+ * @package Core\Valid
  */
 class Validator
 {
@@ -15,14 +15,14 @@ class Validator
      * 
      * @var array $data
      */
-    private array $data = [];
+    private $data;
 
     /**
      * Error tampung disini
      * 
      * @var array $errors
      */
-    private array $errors = [];
+    private $errors;
 
     /**
      * Init object
@@ -31,7 +31,7 @@ class Validator
      * @param array $rule
      * @return void
      */
-    function __construct(array $data = [], array $rule = [])
+    function __construct(array $data, array $rule)
     {
         $this->data = $data;
         $this->validate($rule);
@@ -86,6 +86,13 @@ class Validator
                 }
                 break;
 
+            case $rule == 'dns':
+                $domain = explode('@', $value);
+                if (!checkdnsrr($domain[1])) {
+                    $this->setError($param, 'ilegal atau tidak sah !');
+                }
+                break;
+
             case $rule == 'url':
                 if (filter_var($value, FILTER_VALIDATE_URL)) {
                     $this->__set($param, filter_var($value, FILTER_SANITIZE_URL));
@@ -119,7 +126,7 @@ class Validator
                 break;
 
             case $rule == 'hash':
-                $this->__set($param, password_hash($value, PASSWORD_BCRYPT));
+                $this->__set($param, Hash::make($value));
                 break;
 
             case $rule == 'trim':
@@ -308,7 +315,7 @@ class Validator
      */
     public function throw(array $error): void
     {
-        $this->errors = array_merge($this->errors, $error);
+        $this->errors = array_merge($this->failed(), $error);
     }
 
     /**
@@ -333,6 +340,7 @@ class Validator
         foreach ($only as $ol) {
             $temp[$ol] = $this->__get($ol);
         }
+
         return $temp;
     }
 

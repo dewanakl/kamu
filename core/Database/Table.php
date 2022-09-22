@@ -17,7 +17,7 @@ class Table
      * 
      * @var array $query
      */
-    private array $query = [];
+    private $query;
 
     /**
      * Tipe dbms
@@ -48,6 +48,7 @@ class Table
     function __construct()
     {
         $this->type = env('DB_DRIV', 'mysql');
+        $this->query = [];
     }
 
     /**

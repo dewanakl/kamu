@@ -98,7 +98,7 @@ class Service
     {
         if ($route && !$method) {
             if ($this->request->ajax()) {
-                $this->respond->terminate($this->respond->json([
+                $this->respond->terminate(json([
                     'error' => 'Method Not Allowed 405'
                 ], 405));
             }
@@ -106,7 +106,7 @@ class Service
             notAllowed();
         } else if (!$route) {
             if ($this->request->ajax()) {
-                $this->respond->terminate($this->respond->json([
+                $this->respond->terminate(json([
                     'error' => 'Not Found 404'
                 ], 404));
             }

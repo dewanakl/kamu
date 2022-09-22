@@ -96,6 +96,22 @@ if (!function_exists('show')) {
     }
 }
 
+if (!function_exists('json')) {
+    /**
+     * Ubah ke json
+     *
+     * @param mixed $data
+     * @param int $statusCode
+     * @return string|false
+     */
+    function json(mixed $data, int $statusCode = 200): string|false
+    {
+        http_response_code($statusCode);
+        header('Content-Type: application/json', true, $statusCode);
+        return json_encode($data);
+    }
+}
+
 if (!function_exists('e')) {
     /**
      * Tampikan hasil secara aman
@@ -135,7 +151,7 @@ if (!function_exists('abort')) {
      */
     function abort(): void
     {
-        header("HTTP/1.1 403 Forbidden");
+        header('HTTP/1.1 403 Forbidden', true, 403);
         show('../helpers/errors/error', [
             'pesan' => 'Forbidden 403'
         ]);
@@ -151,7 +167,7 @@ if (!function_exists('notFound')) {
      */
     function notFound(): void
     {
-        header("HTTP/1.1 404 Not Found");
+        header('HTTP/1.1 404 Not Found', true, 404);
         show('../helpers/errors/error', [
             'pesan' => 'Not Found 404'
         ]);
@@ -167,7 +183,7 @@ if (!function_exists('notAllowed')) {
      */
     function notAllowed(): void
     {
-        header("HTTP/1.1 405 Method Not Allowed");
+        header('HTTP/1.1 405 Method Not Allowed', true, 405);
         show('../helpers/errors/error', [
             'pesan' => 'Method Not Allowed 405'
         ]);
@@ -183,7 +199,7 @@ if (!function_exists('pageExpired')) {
      */
     function pageExpired(): void
     {
-        header("HTTP/1.1 400 Bad Request");
+        header('HTTP/1.1 400 Bad Request', true, 400);
         show('../helpers/errors/error', [
             'pesan' => 'Page Expired !'
         ]);
@@ -199,7 +215,7 @@ if (!function_exists('unavailable')) {
      */
     function unavailable(): void
     {
-        header("HTTP/1.1 503 Service Unavailable");
+        header('HTTP/1.1 503 Service Unavailable', true, 503);
         show('../helpers/errors/error', [
             'pesan' => 'Service Unavailable !'
         ]);

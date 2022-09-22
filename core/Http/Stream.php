@@ -91,7 +91,7 @@ class Stream
 
         if (strtotime($this->request->server('HTTP_IF_MODIFIED_SINCE')) == $timeFile || trim($this->request->server('HTTP_IF_NONE_MATCH')) == $hashFile) {
             http_response_code(304);
-            header('HTTP/1.1 304 Not Modified');
+            header('HTTP/1.1 304 Not Modified', true, 304);
             exit;
         }
 
@@ -292,7 +292,7 @@ class Stream
         }
 
         if ($t > 0) {
-            header('HTTP/1.1 206 Partial Content');
+            header('HTTP/1.1 206 Partial Content', true, 206);
             ($t === 1) ? $this->pushSingle($range) : $this->pushMulti($ranges);
         } else {
             header('Content-Length: ' . $this->size);

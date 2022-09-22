@@ -120,7 +120,7 @@ class Kernel
                 unavailable();
             }
 
-            header('HTTP/1.1 500 Internal Server Error');
+            header('HTTP/1.1 500 Internal Server Error', true, 500);
             show('../helpers/errors/trace', compact('error'));
         });
 

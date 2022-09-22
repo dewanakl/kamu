@@ -30,7 +30,9 @@ class Application
      */
     function __construct()
     {
-        $this->objectPool = [];
+        if (is_null($this->objectPool)) {
+            $this->objectPool = [];
+        }
     }
 
     /**

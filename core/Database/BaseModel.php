@@ -5,6 +5,7 @@ namespace Core\Database;
 use ArrayIterator;
 use Closure;
 use Core\Facades\App;
+use Exception;
 use IteratorAggregate;
 use JsonSerializable;
 use ReturnTypeWillChange;
@@ -115,7 +116,7 @@ class BaseModel implements IteratorAggregate, JsonSerializable
         $this->db->query($query);
 
         foreach ($data as $key => $val) {
-            $this->db->bind(":" . $key, $val);
+            $this->db->bind(':' . $key, $val);
         }
 
         $this->query = null;
@@ -177,10 +178,32 @@ class BaseModel implements IteratorAggregate, JsonSerializable
         $this->query = null;
         $this->param = [];
 
-        $this->attributes = $data[0];
-        $this->table = $data[1];
-        $this->dates = $data[2];
-        $this->primaryKey = $data[3];
+        list(
+            $this->attributes,
+            $this->table,
+            $this->dates,
+            $this->primaryKey
+        ) = $data;
+    }
+
+    /**
+     * Eksport to json
+     *
+     * @return string|false
+     */
+    public function toJson(): string|false
+    {
+        return json_encode($this->attribute());
+    }
+
+    /**
+     * Eksport to array
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return json_decode($this->toJson(), true);
     }
 
     /**
@@ -351,13 +374,8 @@ class BaseModel implements IteratorAggregate, JsonSerializable
      */
     public function orderBy(string $name, string $order = 'ASC'): self
     {
-        if (str_contains($this->query, 'ORDER BY')) {
-            $agr = ', ';
-        } else {
-            $agr = ' ORDER BY ';
-        }
-
-        $this->query = $this->query . $agr . $name . ' ' . $order;
+        $agr = str_contains($this->query, 'ORDER BY') ? ', ' : ' ORDER BY ';
+        $this->query = $this->query . $agr . $name . ' ' . strtoupper($order);
 
         return $this;
     }
@@ -486,7 +504,7 @@ class BaseModel implements IteratorAggregate, JsonSerializable
      * @param Closure $fn
      * @return mixed
      */
-    public function failFunction(Closure $fn): mixed
+    public function fail(Closure $fn): mixed
     {
         if (!$this->attributes) {
             return $fn();
@@ -505,6 +523,19 @@ class BaseModel implements IteratorAggregate, JsonSerializable
     public function find(mixed $id, ?string $where = null): self
     {
         return $this->where(is_null($where) ? $this->primaryKey : $where, $id)->limit(1)->first();
+    }
+
+    /**
+     * Save perubahan pada attribute dengan primarykey
+     *
+     * @return bool
+     */
+    public function save(): bool
+    {
+        $attributes = $this->attribute();
+        unset($attributes[$this->primaryKey]);
+
+        return $this->where($this->primaryKey, $this->__get($this->primaryKey))->update($attributes);
     }
 
     /**
@@ -536,7 +567,7 @@ class BaseModel implements IteratorAggregate, JsonSerializable
             'INSERT INTO %s (%s) VALUES (%s)',
             $this->table,
             implode(', ',  $keys),
-            implode(', ',  array_map(fn ($data) => ":" . $data, $keys))
+            implode(', ',  array_map(fn ($data) => ':' . $data, $keys))
         );
 
         $this->bind($query, $data);
@@ -574,7 +605,7 @@ class BaseModel implements IteratorAggregate, JsonSerializable
             return false;
         }
 
-        return $result;
+        return (bool) $result;
     }
 
     /**
@@ -593,7 +624,7 @@ class BaseModel implements IteratorAggregate, JsonSerializable
             return false;
         }
 
-        return $result;
+        return (bool) $result;
     }
 
     /**
@@ -609,6 +640,22 @@ class BaseModel implements IteratorAggregate, JsonSerializable
         }
 
         return null;
+    }
+
+    /**
+     * Isi nilai ke model ini
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return void
+     */
+    public function __set(string $name, mixed $value): void
+    {
+        if ($this->primaryKey == $name) {
+            throw new Exception('Nilai primary key tidak bisa di ubah !');
+        }
+
+        $this->attributes[$name] = $value;
     }
 
     /**

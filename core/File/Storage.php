@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Support;
+namespace Core\File;
 
 use Core\Facades\App;
 use Core\Http\Stream;
@@ -9,7 +9,7 @@ use Core\Http\Stream;
  * Storage manipulation
  *
  * @class Storage
- * @package Core\Support
+ * @package Core\File
  */
 final class Storage
 {

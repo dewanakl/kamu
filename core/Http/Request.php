@@ -2,8 +2,8 @@
 
 namespace Core\Http;
 
-use Core\Support\File;
-use Core\Support\Validator;
+use Core\File\File;
+use Core\Valid\Validator;
 
 /**
  * Request yang masuk
@@ -56,7 +56,7 @@ class Request
         if ($this->validator->fails()) {
             session()->set('old', $this->all());
             session()->set('error', $this->validator->failed());
-            respond()->redirect(session()->get('oldRoute', '/'));
+            respond()->redirect(session()->get('_oldroute', '/'));
         }
     }
 
@@ -223,6 +223,7 @@ class Request
         foreach ($only as $ol) {
             $temp[$ol] = $this->__get($ol);
         }
+
         return $temp;
     }
 
@@ -240,6 +241,7 @@ class Request
                 $temp[$key] = $value;
             }
         }
+
         return $temp;
     }
 
