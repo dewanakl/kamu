@@ -5,7 +5,7 @@ namespace Core\Routing;
 use Core\Http\Request;
 use Core\Http\Respond;
 use Core\Valid\Validator;
-use Core\View\Render;
+use Core\View\View;
 
 /**
  * Base controller untuk mempermudah memanggil fungsi
@@ -16,15 +16,19 @@ use Core\View\Render;
 abstract class Controller
 {
     /**
-     * Render template html
+     * View template html
      *
      * @param string $path
      * @param array $data
-     * @return Render
+     * @return View
      */
-    protected function view(string $path, array $data = []): Render
+    protected function view(string $path, array $data = []): View
     {
-        return extend($path, $data);
+        $view = app(View::class);
+        $view->variables($data);
+        $view->show($path);
+
+        return $view;
     }
 
     /**

@@ -109,7 +109,8 @@ class Kernel
             }
 
             header('HTTP/1.1 500 Internal Server Error', true, 500);
-            echo extend('../helpers/errors/trace', compact('error'));
+            echo render('../helpers/errors/trace', compact('error'));
+            exit;
         });
 
         if (!env('APP_KEY')) {

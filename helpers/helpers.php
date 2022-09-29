@@ -7,6 +7,7 @@ use Core\Http\Request;
 use Core\Http\Respond;
 use Core\Routing\Route;
 use Core\Http\Session;
+use Core\View\View;
 
 if (!function_exists('app')) {
     /**
@@ -63,7 +64,7 @@ if (!function_exists('auth')) {
     }
 }
 
-if (!function_exists('extend')) {
+if (!function_exists('render')) {
     /**
      * Baca dari view serta masih bentuk object
      * 
@@ -71,7 +72,7 @@ if (!function_exists('extend')) {
      * @param array $data
      * @return Render
      */
-    function extend(string $path, array $data = []): Render
+    function render(string $path, array $data = []): Render
     {
         $template = new Render($path);
         $template->setData($data);
@@ -136,7 +137,7 @@ if (!function_exists('dd')) {
     {
         header('Content-Type: text/html');
         clear_ob();
-        echo extend('../helpers/errors/dd', [
+        echo render('../helpers/errors/dd', [
             'param' => $param
         ]);
         exit;
@@ -153,7 +154,7 @@ if (!function_exists('abort')) {
     {
         header('HTTP/1.1 403 Forbidden', true, 403);
         clear_ob();
-        echo extend('../helpers/errors/error', [
+        echo render('../helpers/errors/error', [
             'pesan' => 'Forbidden 403'
         ]);
         exit;
@@ -170,7 +171,7 @@ if (!function_exists('notFound')) {
     {
         header('HTTP/1.1 404 Not Found', true, 404);
         clear_ob();
-        echo extend('../helpers/errors/error', [
+        echo render('../helpers/errors/error', [
             'pesan' => 'Not Found 404'
         ]);
         exit;
@@ -187,7 +188,7 @@ if (!function_exists('notAllowed')) {
     {
         header('HTTP/1.1 405 Method Not Allowed', true, 405);
         clear_ob();
-        echo extend('../helpers/errors/error', [
+        echo render('../helpers/errors/error', [
             'pesan' => 'Method Not Allowed 405'
         ]);
         exit;
@@ -204,7 +205,7 @@ if (!function_exists('pageExpired')) {
     {
         header('HTTP/1.1 400 Bad Request', true, 400);
         clear_ob();
-        echo extend('../helpers/errors/error', [
+        echo render('../helpers/errors/error', [
             'pesan' => 'Page Expired !'
         ]);
         exit;
@@ -221,7 +222,7 @@ if (!function_exists('unavailable')) {
     {
         header('HTTP/1.1 503 Service Unavailable', true, 503);
         clear_ob();
-        echo extend('../helpers/errors/error', [
+        echo render('../helpers/errors/error', [
             'pesan' => 'Service Unavailable !'
         ]);
         exit;
@@ -416,6 +417,73 @@ if (!function_exists('now')) {
     function now(string $format = 'Y-m-d H:i:s'): string
     {
         return (new DateTime('now'))->format($format);
+    }
+}
+
+if (!function_exists('parents')) {
+    /**
+     * Set parent html
+     * 
+     * @param string $name
+     * @param array $variables
+     * @return void
+     */
+    function parents(string $name, array $variables = []): void
+    {
+        app(View::class)->parents($name, $variables);
+    }
+}
+
+if (!function_exists('section')) {
+    /**
+     * Bagian awal dari html
+     * 
+     * @param string $name
+     * @return void
+     */
+    function section(string $name): void
+    {
+        app(View::class)->section($name);
+    }
+}
+
+if (!function_exists('content')) {
+    /**
+     * Tampilkan bagian dari html
+     * 
+     * @param string $name
+     * @return string|false|null
+     */
+    function content(string $name): string|false|null
+    {
+        return app(View::class)->content($name);
+    }
+}
+
+
+if (!function_exists('endsection')) {
+    /**
+     * Bagian akhir dari html
+     * 
+     * @param string $name
+     * @return void
+     */
+    function endsection(string $name): void
+    {
+        app(View::class)->endsection($name);
+    }
+}
+
+if (!function_exists('including')) {
+    /**
+     * Masukan html opsional
+     * 
+     * @param string $name
+     * @return Render
+     */
+    function including(string $name): Render
+    {
+        return app(View::class)->including($name);
     }
 }
 
