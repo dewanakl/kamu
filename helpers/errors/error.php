@@ -26,7 +26,7 @@
         .fof h1 {
             font-size: 40px;
             display: inline-block;
-            padding-right: 15px;
+            padding-right: 1rem;
             animation: type .5s alternate infinite;
         }
 

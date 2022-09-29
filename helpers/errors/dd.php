@@ -8,7 +8,7 @@
     <title>Kamu - Debug</title>
     <style>
         pre {
-            margin: 20px 10px;
+            margin: 2rem 1rem;
             font-size: 14px;
             overflow: auto;
             white-space: pre-wrap;

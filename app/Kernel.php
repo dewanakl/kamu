@@ -37,14 +37,8 @@ class Kernel
     private function loader(): bool
     {
         return spl_autoload_register(function (string $name) {
-            $name = str_replace('\\', '/', $name);
-            $classPath = dirname(__DIR__) . '/' . lcfirst($name) . '.php';
-
-            if (!file_exists($classPath)) {
-                throw new \Exception('Class: ' . $name . ' tidak ada !');
-            }
-
-            require_once $classPath;
+            $name = lcfirst(str_replace('\\', '/', $name));
+            require_once dirname(__DIR__) . '/' . $name . '.php';
         });
     }
 
@@ -57,7 +51,7 @@ class Kernel
     {
         $file = __DIR__ . '/../.env';
         $lines = file_exists($file)
-            ? @file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)
+            ? file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)
             : [];
 
         foreach ($lines as $line) {
@@ -66,13 +60,7 @@ class Kernel
             }
 
             list($name, $value) = explode('=', $line, 2);
-            $name = trim($name);
-            $value = trim($value);
-
-            if (!array_key_exists($name, $_ENV)) {
-                putenv(sprintf('%s=%s', $name, $value));
-                $_ENV[$name] = $value;
-            }
+            $_ENV[trim($name)] = trim($value);
         }
     }
 
@@ -105,7 +93,7 @@ class Kernel
     {
         $self = new self();
 
-        define('HTTPS', ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443 || @$_ENV['HTTPS']));
+        define('HTTPS', (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443 || @$_ENV['HTTPS']);
         define('BASEURL', @$_ENV['BASEURL'] ? rtrim($_ENV['BASEURL'], '/') : (HTTPS ? 'https://' : 'http://') . $_SERVER['HTTP_HOST']);
         define('DEBUG', @$_ENV['DEBUG'] == 'true');
 
@@ -114,14 +102,14 @@ class Kernel
 
         set_exception_handler(function (\Throwable $error) {
             header('Content-Type: text/html');
-            @ob_end_clean();
+            clear_ob();
 
             if (!DEBUG) {
                 unavailable();
             }
 
             header('HTTP/1.1 500 Internal Server Error', true, 500);
-            show('../helpers/errors/trace', compact('error'));
+            echo extend('../helpers/errors/trace', compact('error'));
         });
 
         if (!env('APP_KEY')) {
