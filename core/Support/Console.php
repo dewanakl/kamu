@@ -20,7 +20,7 @@ class Console
     private $command;
 
     /**
-     * Perintah untuk eksekusi
+     * Optional perintah untuk eksekusi
      * 
      * @var string $command
      */
@@ -29,7 +29,7 @@ class Console
     /**
      * Waktu yang dibutuhkan
      * 
-     * @var int $timenow
+     * @var float $timenow
      */
     private $timenow;
 
@@ -113,7 +113,8 @@ class Console
     private function exception(string $message, bool $fail = true, ?string $options = null): void
     {
         if ($fail) {
-            exit($this->createColor('red', $message . "\n"));
+            print($this->createColor('red', $message . "\n"));
+            exit;
         }
 
         if ($options) {
@@ -129,7 +130,7 @@ class Console
     private function executeTime(): string
     {
         $now = microtime(true);
-        $result = floor(number_format($now - $this->timenow, 3, ''));
+        $result = diffTime($this->timenow, $now);
         $this->timenow = $now;
 
         return $this->createColor('cyan', '(' . $result . ' ms)');
@@ -141,7 +142,7 @@ class Console
      * @param bool $up
      * @return void
      */
-    private function migrasi(bool $up = true): void
+    private function migrasi(bool $up): void
     {
         $baseFile = __DIR__ . '/../../database/schema/';
 
@@ -169,6 +170,67 @@ class Console
     }
 
     /**
+     * Load template file
+     *
+     * @param ?string $name
+     * @param int $tipe
+     * @return mixed
+     */
+    private function loadTemplate(?string $name, int $tipe): mixed
+    {
+        $this->exception('Butuh Nama file !', !$name);
+        $type = '';
+        switch ($tipe) {
+            case 1:
+                $type = 'templateMigrasi';
+                break;
+            case 2:
+                $type = 'templateMiddleware';
+                break;
+            case 3:
+                $type = 'templateController';
+                break;
+            default:
+                $type = 'templateModel';
+                break;
+        }
+
+        return require_once __DIR__ . '/../../helpers/templates/' . $type . '.php';
+    }
+
+    /**
+     * Save template file
+     *
+     * @param string $name
+     * @param mixed $data
+     * @param int $tipe
+     * @return void
+     */
+    private function saveTemplate(string $name, mixed $data, int $tipe): void
+    {
+        $type = '';
+        $optional = '';
+        switch ($tipe) {
+            case 1:
+                $type = 'database/schema';
+                $optional = strtotime('now') . '_';
+                break;
+            case 2:
+                $type = 'middleware';
+                break;
+            case 3:
+                $type = 'controllers';
+                break;
+            default:
+                $type = 'models';
+                break;
+        }
+
+        $result = file_put_contents(__DIR__ . '/../../' . $type . '/' . $optional . $name . '.php', $data);
+        $this->exception('Gagal membuat ' . $type, !$result, 'Berhasil membuat ' . $type . ' ' . $name);
+    }
+
+    /**
      * Buat file migrasi
      *
      * @param ?string $name
@@ -176,11 +238,10 @@ class Console
      */
     private function createMigrasi(?string $name): void
     {
-        $this->exception('Butuh Nama file !', !$name);
-        $data = require_once __DIR__ . '/../../helpers/templates/templateMigrasi.php';
-        $data = str_replace('NAME', $name, $data);
-        $result = file_put_contents(__DIR__ . '/../../database/schema/' . strtotime('now') . '_' . $name . '.php', $data);
-        $this->exception('Gagal membuat migrasi', !$result, 'Berhasil membuat migrasi ' . $name);
+        $data = $this->loadTemplate($name, 1);
+        $data = str_contains(strtolower($name), 'add') ? $data[1] : $data[0];
+        $data = str_replace('NAME', explode('_', $name)[count(explode('_', $name)) - 1], $data);
+        $this->saveTemplate($name, $data, 1);
     }
 
     /**
@@ -191,11 +252,9 @@ class Console
      */
     private function createMiddleware(?string $name): void
     {
-        $this->exception('Butuh Nama file !', !$name);
-        $data = require_once __DIR__ . '/../../helpers/templates/templateMiddleware.php';
+        $data = $this->loadTemplate($name, 2);
         $data = str_replace('NAME', $name, $data);
-        $result = file_put_contents(__DIR__ . '/../../middleware/' . $name . '.php', $data);
-        $this->exception('Gagal membuat middleware', !$result, 'Berhasil membuat middleware ' . $name);
+        $this->saveTemplate($name, $data, 2);
     }
 
     /**
@@ -206,11 +265,9 @@ class Console
      */
     private function createController(?string $name): void
     {
-        $this->exception('Butuh Nama file !', !$name);
-        $data = require_once __DIR__ . '/../../helpers/templates/templateController.php';
+        $data = $this->loadTemplate($name, 3);
         $data = str_replace('NAME', $name, $data);
-        $result = file_put_contents(__DIR__ . '/../../controllers/' . $name . '.php', $data);
-        $this->exception('Gagal membuat controller', !$result, 'Berhasil membuat controller ' . $name);
+        $this->saveTemplate($name, $data, 3);
     }
 
     /**
@@ -221,12 +278,55 @@ class Console
      */
     private function createModel(?string $name): void
     {
-        $this->exception('Butuh Nama file !', !$name);
-        $data = require_once __DIR__ . '/../../helpers/templates/templateModel.php';
+        $data = $this->loadTemplate($name, 4);
         $data = str_replace('NAME', $name, $data);
         $data = str_replace('NAMe', strtolower($name), $data);
-        $result = file_put_contents(__DIR__ . '/../../models/' . $name . '.php', $data);
-        $this->exception('Gagal membuat model', !$result, 'Berhasil membuat model ' . $name);
+        $this->saveTemplate($name, $data, 4);
+    }
+
+    /**
+     * Buat file mail
+     *
+     * @param ?string $name
+     * @return void
+     */
+    private function createMail(?string $name): void
+    {
+        $this->exception('Butuh Nama file !', !$name);
+        $folder =  __DIR__ . '/../../views/email/';
+        if (!is_dir($folder)) {
+            mkdir($folder, 7777, true);
+        }
+
+        $result = copy(__DIR__ . '/../../helpers/templates/templateMail.php', $folder . $name . '.php');
+        $this->exception('Gagal membuat email', !$result, 'Berhasil membuat email ' . $name);
+    }
+
+    /**
+     * Create key to env file
+     *
+     * @return void
+     */
+    private function createKey(): void
+    {
+        $env = __DIR__ . '/../../.env';
+        if (!file_exists($env)) {
+            $this->exception('env tidak ada !');
+        }
+
+        $lines = file($env, FILE_IGNORE_NEW_LINES);
+        foreach ($lines as $id => $line) {
+            if (str_contains($line, 'APP_KEY=')) {
+                $lines[$id] = 'APP_KEY=' . Hash::rand(8) . ':' . Hash::rand(8);
+                break;
+            }
+        }
+
+        $myfile = fopen($env, 'w');
+        fwrite($myfile, join("\n", $lines));
+        fclose($myfile);
+
+        print("\nAplikasi aman !" . $this->createColor('green', ' berhasil ') . $this->executeTime());
     }
 
     /**
@@ -277,6 +377,10 @@ class Console
                 'command' => 'bikin:model',
                 'description' => 'Bikin file model [nama file]'
             ],
+            [
+                'command' => 'bikin:email',
+                'description' => 'Bikin file email [nama file]'
+            ],
         ];
 
         print("Penggunaan:\n perintah [options]\n\n");
@@ -288,33 +392,6 @@ class Console
     }
 
     /**
-     * Create key to env file
-     *
-     * @return void
-     */
-    private function createKey(): void
-    {
-        $env = __DIR__ . '/../../.env';
-        if (!file_exists($env)) {
-            $this->exception('env tidak ada !');
-        }
-
-        $lines = file($env, FILE_IGNORE_NEW_LINES);
-        foreach ($lines as $id => $line) {
-            if (str_contains($line, 'APP_KEY=')) {
-                $lines[$id] = 'APP_KEY=' . Hash::rand(8) . ':' . Hash::rand(8);
-                break;
-            }
-        }
-
-        $myfile = fopen($env, 'w');
-        fwrite($myfile, join("\n", $lines));
-        fclose($myfile);
-
-        print("\nAplikasi aman !" . $this->createColor('green', ' berhasil ') . $this->executeTime());
-    }
-
-    /**
      * Jalankan console
      *
      * @return int
@@ -323,14 +400,14 @@ class Console
     {
         switch ($this->command) {
             case 'coba':
-                $location = ($this->options) ? $this->options : 'localhost';
-                shell_exec("php -S $location:8000 -t public");
+                $location = ($this->options) ? $this->options : 'localhost:8000';
+                shell_exec("php -S $location -t public");
                 break;
             case 'key':
                 $this->createKey();
                 break;
             case 'migrasi':
-                $this->migrasi();
+                $this->migrasi(true);
                 if ($this->options == '--gen') {
                     $this->generator();
                 }
@@ -343,7 +420,7 @@ class Console
                 break;
             case 'migrasi:segar':
                 $this->migrasi(false);
-                $this->migrasi();
+                $this->migrasi(true);
                 if ($this->options == '--gen') {
                     $this->generator();
                 }
@@ -359,6 +436,9 @@ class Console
                 break;
             case 'bikin:model':
                 $this->createModel($this->options);
+                break;
+            case 'bikin:email':
+                $this->createMail($this->options);
                 break;
             default:
                 $this->listMenu();

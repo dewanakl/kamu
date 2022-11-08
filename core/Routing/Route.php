@@ -109,6 +109,6 @@ final class Route
      */
     public static function router(): Router
     {
-        return Router::self();
+        return app(Router::class);
     }
 }

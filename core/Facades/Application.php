@@ -2,9 +2,12 @@
 
 namespace Core\Facades;
 
+use Closure;
 use Exception;
+use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionFunction;
 use ReflectionMethod;
 
 /**
@@ -93,6 +96,10 @@ class Application
             $this->objectPool[$name] = $this->getConstructor($name, $param);
         }
 
+        if (!is_object($this->objectPool[$name])) {
+            $this->objectPool[$name] = $this->getConstructor($this->objectPool[$name]);
+        }
+
         return $this->objectPool[$name];
     }
 
@@ -132,6 +139,63 @@ class Application
             return $reflectionMethod->invokeArgs($name, $params);
         } catch (ReflectionException $e) {
             throw new Exception($e->getMessage());
+        }
+    }
+
+    /**
+     * Hapus dan dapatkan object itu terlebih dahulu
+     * 
+     * @param string $name
+     * @return mixed
+     */
+    public function clean(string $name): mixed
+    {
+        $object = $this->objectPool[$name] ?? null;
+        unset($this->objectPool[$name]);
+        return $object;
+    }
+
+    /**
+     * Inject objek pada suatu closure fungsi
+     *
+     * @param Closure $name
+     * @return mixed
+     * 
+     * @throws Exception
+     */
+    public function resolve(Closure $name): mixed
+    {
+        try {
+            $reflector = new ReflectionFunction($name);
+            return $reflector->invokeArgs($this->getDependencies($reflector->getParameters(), array($this)));
+        } catch (ReflectionException $e) {
+            throw new Exception($e->getMessage());
+        }
+    }
+
+    /**
+     * Binding interface dengan class object
+     *
+     * @param string $interface
+     * @param Closure|string $class
+     * @return void
+     * 
+     * @throws InvalidArgumentException
+     */
+    public function bind(string $interface, Closure|string $class): void
+    {
+        if (empty($this->objectPool[$interface])) {
+            if ($class instanceof Closure) {
+                $result = $this->resolve($class);
+
+                if (!is_object($result)) {
+                    throw new InvalidArgumentException('Return value harus sebuah object !');
+                }
+
+                $class = $result;
+            }
+
+            $this->objectPool[$interface] = $class;
         }
     }
 }

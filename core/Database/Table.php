@@ -41,6 +41,13 @@ class Table
     private $alter;
 
     /**
+     * Colums di tabel ini
+     * 
+     * @var array $columns
+     */
+    private $columns;
+
+    /**
      * Init objek
      *
      * @return void
@@ -49,6 +56,8 @@ class Table
     {
         $this->type = env('DB_DRIV', 'mysql');
         $this->query = [];
+        $this->alter = null;
+        $this->columns = [];
     }
 
     /**
@@ -73,6 +82,7 @@ class Table
         $query .= join(', ', $this->query);
         $query .= ');';
         $this->query = [];
+        $this->columns = [];
 
         return $query;
     }
@@ -80,15 +90,39 @@ class Table
     /**
      * Export hasilnya ke string sql
      * 
-     * @return string
+     * @return string|null
      */
-    public function export(): string
+    public function export(): string|null
     {
+        if ($this->alter != null) {
+            $db = app(DataBase::class);
+
+            foreach ($this->columns as $value) {
+                if ($this->type == 'pgsql') {
+                    $query = "SELECT column_name FROM information_schema.columns WHERE table_name='{$this->table}' and column_name='{$value}';";
+                } else {
+                    $query = "SHOW COLUMNS FROM {$this->table} WHERE Field = '{$value}';";
+                }
+
+                $db->query($query);
+                $db->execute();
+                $jumlahColumn = $db->rowCount();
+
+                if ($jumlahColumn != 0) {
+                    $this->query = [];
+                    $this->alter = null;
+                    $this->columns = [];
+                    return null;
+                }
+            }
+        }
+
         $query = 'ALTER TABLE ' . $this->table . ' ';
         $query .= join(', ', array_map(fn ($data) => $this->alter . ' ' . $data, $this->query));
         $query .= ';';
         $this->query = [];
         $this->alter = null;
+        $this->columns = [];
 
         return $query;
     }
@@ -116,6 +150,7 @@ class Table
         } else {
             $this->query[] = "$name INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT";
         }
+        $this->columns[] = $name;
     }
 
     /**
@@ -128,6 +163,7 @@ class Table
     public function string(string $name, int $len = 255): self
     {
         $this->query[] = "$name VARCHAR($len) NOT NULL";
+        $this->columns[] = $name;
         return $this;
     }
 
@@ -144,7 +180,7 @@ class Table
         } else {
             $this->query[] = "$name INTEGER(11) NOT NULL";
         }
-
+        $this->columns[] = $name;
         return $this;
     }
 
@@ -157,6 +193,20 @@ class Table
     public function text(string $name): self
     {
         $this->query[] = "$name TEXT NOT NULL";
+        $this->columns[] = $name;
+        return $this;
+    }
+
+    /**
+     * Tipe boolean
+     * 
+     * @param string $name
+     * @return self
+     */
+    public function boolean(string $name): self
+    {
+        $this->query[] = "$name BOOLEAN NOT NULL";
+        $this->columns[] = $name;
         return $this;
     }
 
@@ -173,7 +223,7 @@ class Table
         } else {
             $this->query[] = "$name DATETIME NOT NULL";
         }
-
+        $this->columns[] = $name;
         return $this;
     }
 
@@ -191,6 +241,8 @@ class Table
             $this->query[] = "created_at DATETIME NULL";
             $this->query[] = "updated_at DATETIME NULL";
         }
+        $this->columns[] = 'created_at';
+        $this->columns[] = 'updated_at';
     }
 
     /**
@@ -207,12 +259,12 @@ class Table
     /**
      * Default value pada dbms
      * 
-     * @param string|int $name
+     * @param string|int|bool $name
      * @return void
      */
-    public function default(string|int $name): void
+    public function default(string|int|bool $name): void
     {
-        $constraint = is_string($name) ? " DEFAULT '$name'" : " DEFAULT $name";
+        $constraint = is_string($name) ? " DEFAULT '$name'" : " DEFAULT " . (is_bool($name) ? ($name ? 'true' : 'false') : $name);
 
         $this->query[$this->getLastArray()] = end($this->query) . $constraint;
     }
@@ -308,5 +360,6 @@ class Table
     {
         $this->alter = 'RENAME';
         $this->query[$this->getLastArray()] = $from . ' TO ' . $to;
+        $this->columns[] = $from;
     }
 }

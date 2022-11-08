@@ -121,8 +121,8 @@ if (!function_exists('e')) {
      */
     function e(mixed $var): string
     {
-        $var = is_null($var) ? '' : $var;
-        return htmlspecialchars($var, ENT_QUOTES);
+        $var = is_null($var) ? '' : strval($var);
+        return htmlspecialchars($var);
     }
 }
 
@@ -314,7 +314,7 @@ if (!function_exists('route')) {
 
         foreach ($keys as $key) {
             $pos = strpos($param, $regex);
-            $param = ($pos !== false) ? substr_replace($param, $key, $pos, strlen($regex)) : $param;
+            $param = ($pos !== false) ? substr_replace($param, strval($key), $pos, strlen($regex)) : $param;
         }
 
         if (str_contains($param, $regex)) {
@@ -370,11 +370,11 @@ if (!function_exists('routeIs')) {
      * Cek apakah routenya sudah sesuai
      * 
      * @param string $param
-     * @param ?string $optional
+     * @param mixed $optional
      * @param bool $notcontains
      * @return mixed
      */
-    function routeIs(string $param, ?string $optional = null, bool $notcontains = false): mixed
+    function routeIs(string $param, mixed $optional = null, bool $notcontains = false): mixed
     {
         $now = app(Request::class)->server('REQUEST_URI');
         $route = $notcontains ? $now == $param : str_contains($now, $param);
@@ -416,7 +416,7 @@ if (!function_exists('now')) {
      */
     function now(string $format = 'Y-m-d H:i:s'): string
     {
-        return (new DateTime('now'))->format($format);
+        return (new DateTime())->format($format);
     }
 }
 
@@ -460,7 +460,6 @@ if (!function_exists('content')) {
     }
 }
 
-
 if (!function_exists('endsection')) {
     /**
      * Bagian akhir dari html
@@ -500,18 +499,32 @@ if (!function_exists('formatBytes')) {
         $base = log($size, 1024);
         $suffixes = ['Byte', 'Kb', 'Mb', 'Gb', 'Tb'];
 
-        return (string) round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
+        return strval(round(pow(1024, $base - floor($base)), $precision)) . $suffixes[floor($base)];
+    }
+}
+
+if (!function_exists('diffTime')) {
+    /**
+     * Dapatkan selisih waktu dalam ms
+     * 
+     * @param float $start
+     * @param float $end
+     * @return int
+     */
+    function diffTime(float $start, float $end): int
+    {
+        return intval(floor(floatval(number_format($end - $start, 3, '', ''))));
     }
 }
 
 if (!function_exists('getPageTime')) {
     /**
-     * Dapatkan waktu yang dibutuhkan untuk merender halaman
+     * Dapatkan waktu yang dibutuhkan untuk merender halaman dalam (ms)
      * 
-     * @return string
+     * @return int
      */
-    function getPageTime(): string
+    function getPageTime(): int
     {
-        return (string) floor(number_format(microtime(true) - START_TIME, 3, ''));
+        return diffTime(START_TIME, microtime(true));
     }
 }

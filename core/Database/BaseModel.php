@@ -5,6 +5,7 @@ namespace Core\Database;
 use ArrayIterator;
 use Closure;
 use Core\Facades\App;
+use Countable;
 use Exception;
 use IteratorAggregate;
 use JsonSerializable;
@@ -17,7 +18,7 @@ use Traversable;
  * @class BaseModel
  * @package Core\Database
  */
-class BaseModel implements IteratorAggregate, JsonSerializable
+class BaseModel implements Countable, IteratorAggregate, JsonSerializable
 {
     /**
      * String query sql
@@ -240,6 +241,16 @@ class BaseModel implements IteratorAggregate, JsonSerializable
     }
 
     /**
+     * Get primaryKey
+     *
+     * @return string
+     */
+    public function getPrimaryKey(): string
+    {
+        return $this->primaryKey;
+    }
+
+    /**
      * Debug querynya
      *
      * @return void
@@ -251,23 +262,13 @@ class BaseModel implements IteratorAggregate, JsonSerializable
     }
 
     /**
-     * Mulai transaksinya
+     * Hitung jumlah data attribute
      *
-     * @return bool
+     * @return int
      */
-    public function startTransaction(): bool
+    public function count(): int
     {
-        return $this->db->startTransaction();
-    }
-
-    /**
-     * Akhiri transaksinya
-     *
-     * @return bool
-     */
-    public function endTransaction(): bool
-    {
-        return $this->db->endTransaction();
+        return count($this->attribute());
     }
 
     /**
@@ -431,11 +432,15 @@ class BaseModel implements IteratorAggregate, JsonSerializable
     /**
      * Select raw syntax sql
      *
-     * @param string $param
+     * @param string|array $param
      * @return self
      */
-    public function select(string ...$param): self
+    public function select(string|array ...$param): self
     {
+        if (is_array($param[0])) {
+            $param = $param[0];
+        }
+
         $this->checkSelect();
         $param = implode(', ', $param);
 
@@ -486,16 +491,11 @@ class BaseModel implements IteratorAggregate, JsonSerializable
     /**
      * Ambil atau error "tidak ada"
      *
-     * @return self
+     * @return mixed
      */
-    public function firstOrFail(): self
+    public function firstOrFail(): mixed
     {
-        $result = $this->first();
-        if (!$result->attributes) {
-            notFound();
-        }
-
-        return $result;
+        return $this->first()->fail(fn () => notFound());
     }
 
     /**
@@ -526,16 +526,31 @@ class BaseModel implements IteratorAggregate, JsonSerializable
     }
 
     /**
+     * Cari berdasarkan id atau error "tidak ada"
+     *
+     * @param mixed $id
+     * @param ?string $where
+     * @return self
+     */
+    public function findOrFail(mixed $id, ?string $where = null): self
+    {
+        return $this->where(is_null($where) ? $this->primaryKey : $where, $id)->limit(1)->firstOrFail();
+    }
+
+    /**
      * Save perubahan pada attribute dengan primarykey
      *
      * @return bool
+     * 
+     * @throws Exception
      */
     public function save(): bool
     {
-        $attributes = $this->attribute();
-        unset($attributes[$this->primaryKey]);
+        if (empty($this->primaryKey) || empty($this->__get($this->primaryKey))) {
+            throw new Exception('Nilai primary key tidak ada !');
+        }
 
-        return $this->where($this->primaryKey, $this->__get($this->primaryKey))->update($attributes);
+        return $this->where($this->primaryKey, $this->__get($this->primaryKey))->update($this->except([$this->primaryKey])->attribute());
     }
 
     /**
@@ -577,8 +592,12 @@ class BaseModel implements IteratorAggregate, JsonSerializable
             return false;
         }
 
+        $this->attributes = $data;
+
         $id = $this->db->lastInsertId();
-        $this->attributes = array_merge($data, [$this->primaryKey => $id]);
+        if ($id) {
+            $this->attributes[$this->primaryKey] = intval($id);
+        }
 
         return $this;
     }
@@ -601,11 +620,7 @@ class BaseModel implements IteratorAggregate, JsonSerializable
         $this->bind(str_replace('WHERE', $setQuery, $query), array_merge($data, $this->param ?? []));
         $result = $this->db->execute();
 
-        if ($result === false) {
-            return false;
-        }
-
-        return (bool) $result;
+        return boolval($result);
     }
 
     /**
@@ -620,11 +635,45 @@ class BaseModel implements IteratorAggregate, JsonSerializable
         $this->bind($query, $this->param ?? []);
         $result = $this->db->execute();
 
-        if ($result === false) {
-            return false;
+        return boolval($result);
+    }
+
+    /**
+     * Ambil sebagian dari attribute
+     * 
+     * @param array $only
+     * @return self
+     */
+    public function only(array $only): self
+    {
+        $temp = [];
+        foreach ($only as $ol) {
+            $temp[$ol] = $this->__get($ol);
         }
 
-        return (bool) $result;
+        $this->attributes = $temp;
+
+        return $this;
+    }
+
+    /**
+     * Ambil kecuali dari attribute
+     * 
+     * @param array $except
+     * @return self
+     */
+    public function except(array $except): self
+    {
+        $temp = [];
+        foreach ($this->attribute() as $key => $value) {
+            if (!in_array($key, $except)) {
+                $temp[$key] = $value;
+            }
+        }
+
+        $this->attributes = $temp;
+
+        return $this;
     }
 
     /**
@@ -648,6 +697,8 @@ class BaseModel implements IteratorAggregate, JsonSerializable
      * @param string $name
      * @param mixed $value
      * @return void
+     * 
+     * @throws Exception
      */
     public function __set(string $name, mixed $value): void
     {

@@ -61,18 +61,34 @@ class Request
     }
 
     /**
+     * Ambil nilai dari request ini
+     *
+     * @param ?string $name
+     * @param mixed $defaultValue
+     * @return mixed
+     */
+    public function get(?string $name = null, mixed $defaultValue = null): mixed
+    {
+        if ($name === null) {
+            return $this->requestData;
+        }
+
+        return $this->requestData[$name] ?? $defaultValue;
+    }
+
+    /**
      * Ambil nilai dari request server ini
      *
      * @param ?string $name
      * @return mixed
      */
-    public function server(?string $name = null): mixed
+    public function server(?string $name = null, mixed $defaultValue = null): mixed
     {
-        if (!$name) {
+        if ($name === null) {
             return $this->serverData;
         }
 
-        return $this->serverData[$name] ?? null;
+        return $this->serverData[$name] ?? $defaultValue;
     }
 
     /**
@@ -141,6 +157,18 @@ class Request
     }
 
     /**
+     * Tampilkan error secara manual
+     *
+     * @param array $error
+     * @return void
+     */
+    public function throw(array $error = []): void
+    {
+        $this->validator->throw($error);
+        $this->fails();
+    }
+
+    /**
      * Validasi request yang masuk
      *
      * @param array $params
@@ -171,34 +199,6 @@ class Request
         $file = new File($this);
         $file->getFromRequest($name);
         return $file;
-    }
-
-    /**
-     * Tampilkan error secara manual
-     *
-     * @param array $error
-     * @return void
-     */
-    public function throw(array $error = []): void
-    {
-        $this->validator->throw($error);
-        $this->fails();
-    }
-
-    /**
-     * Ambil nilai dari request ini
-     *
-     * @param ?string $name
-     * @param mixed $defaultValue
-     * @return mixed
-     */
-    public function get(?string $name = null, mixed $defaultValue = null): mixed
-    {
-        if ($name === null) {
-            return $this->requestData;
-        }
-
-        return $this->requestData[$name] ?? $defaultValue;
     }
 
     /**

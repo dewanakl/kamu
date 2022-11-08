@@ -45,7 +45,7 @@ class View
      */
     function __toString()
     {
-        $content = $this->content;
+        $content = strval($this->content);
 
         $this->section = [];
         $this->variables = [];
@@ -67,6 +67,7 @@ class View
         $this->content = $this->including($name);
 
         if (!is_null($this->parent)) {
+            $this->content = null;
             $this->show($this->parent);
         }
     }

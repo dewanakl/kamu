@@ -17,6 +17,13 @@ class Kernel
     private $app;
 
     /**
+     * Object kernel
+     * 
+     * @var self $self
+     */
+    private static $self;
+
+    /**
      * Init object
      * 
      * @return void
@@ -50,9 +57,7 @@ class Kernel
     private function setEnv(): void
     {
         $file = __DIR__ . '/../.env';
-        $lines = file_exists($file)
-            ? file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)
-            : [];
+        $lines = file_exists($file) ? file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) : [];
 
         foreach ($lines as $line) {
             if (strpos(trim($line), '#') === 0) {
@@ -62,6 +67,50 @@ class Kernel
             list($name, $value) = explode('=', $line, 2);
             $_ENV[trim($name)] = trim($value);
         }
+    }
+
+    /**
+     * Apakah https ?
+     * 
+     * @return bool
+     */
+    public function getHttps(): bool
+    {
+        return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443 || @$_ENV['HTTPS'] == 'true';
+    }
+
+    /**
+     * Dapatkan baseurl
+     * 
+     * @param bool $https
+     * @return string
+     */
+    public function getBaseurl(bool $https): string
+    {
+        return @$_ENV['BASEURL'] ? rtrim($_ENV['BASEURL'], '/') : ($https ? 'https://' : 'http://') . trim($_SERVER['HTTP_HOST']);
+    }
+
+    /**
+     * Tangani errornya
+     * 
+     * @return void
+     */
+    public function errorHandler(): void
+    {
+        error_reporting(DEBUG ? E_ALL : 0);
+
+        set_exception_handler(function (\Throwable $error) {
+            clear_ob();
+            header('Content-Type: text/html');
+
+            if (!DEBUG) {
+                unavailable();
+            }
+
+            header('HTTP/1.1 500 Internal Server Error', true, 500);
+            echo render('../helpers/errors/trace', compact('error'));
+            exit;
+        });
     }
 
     /**
@@ -88,38 +137,26 @@ class Kernel
      * Kernel for web
      * 
      * @return object
+     * @throws Exception
      */
     public static function web(): object
     {
-        $self = new self();
+        if (!(static::$self instanceof self)) {
+            static::$self = new self();
+        }
 
-        define('HTTPS', (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443 || @$_ENV['HTTPS']);
-        define('BASEURL', @$_ENV['BASEURL'] ? rtrim($_ENV['BASEURL'], '/') : (HTTPS ? 'https://' : 'http://') . $_SERVER['HTTP_HOST']);
+        define('HTTPS', static::$self->getHttps());
+        define('BASEURL', static::$self->getBaseurl(HTTPS));
         define('DEBUG', @$_ENV['DEBUG'] == 'true');
 
-        error_reporting(DEBUG ? E_ALL : 0);
-        $self->helper();
-
-        set_exception_handler(function (\Throwable $error) {
-            header('Content-Type: text/html');
-            clear_ob();
-
-            if (!DEBUG) {
-                unavailable();
-            }
-
-            header('HTTP/1.1 500 Internal Server Error', true, 500);
-            echo render('../helpers/errors/trace', compact('error'));
-            exit;
-        });
+        static::$self->helper();
+        static::$self->errorHandler();
 
         if (!env('APP_KEY')) {
             throw new \Exception('App Key gk ada !');
         }
 
-        require_once __DIR__ . '/../routes/routes.php';
-
-        return $self->app();
+        return static::$self->app();
     }
 
     /**
@@ -129,8 +166,11 @@ class Kernel
      */
     public static function console(): object
     {
-        $self = new self();
-        $self->helper();
-        return $self->app();
+        if (!(static::$self instanceof self)) {
+            static::$self = new self();
+        }
+
+        static::$self->helper();
+        return static::$self->app();
     }
 }

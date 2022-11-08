@@ -2,21 +2,17 @@
 
 namespace Core\Database;
 
+use Closure;
+use Exception;
+
 /**
- * Helper class DB untuk custome nama table
+ * Helper class DB untuk customizable nama table
  *
  * @class DB
  * @package Core\Database
  */
 final class DB
 {
-    /**
-     * Simpan jadi objek tunggal
-     * 
-     * @var BaseModel $base
-     */
-    private static $base;
-
     /**
      * Nama tabelnya apah ?
      *
@@ -25,12 +21,9 @@ final class DB
      */
     public static function table(string $name): BaseModel
     {
-        if (!(self::$base instanceof BaseModel)) {
-            self::$base = new BaseModel();
-        }
-
-        self::$base->table($name);
-        return self::$base;
+        $base = new BaseModel();
+        $base->table($name);
+        return $base;
     }
 
     /**
@@ -40,17 +33,55 @@ final class DB
      */
     public static function beginTransaction(): bool
     {
-        self::$base = new BaseModel();
-        return self::$base->startTransaction();
+        return app(DataBase::class)->beginTransaction();
     }
 
     /**
-     * Akhiri transaksinya
+     * Commit transaksinya
      *
      * @return bool
      */
-    public static function endTransaction(): bool
+    public static function commit(): bool
     {
-        return self::$base->endTransaction();
+        return app(DataBase::class)->commit();
+    }
+
+    /**
+     * Kembalikan transaksinya
+     *
+     * @return bool
+     */
+    public static function rollBack(): bool
+    {
+        return app(DataBase::class)->rollBack();
+    }
+
+    /**
+     * Tampilkan errornya
+     *
+     * @param mixed $e
+     * @return void
+     */
+    public static function exception(mixed $e): void
+    {
+        app(DataBase::class)->catchException($e);
+    }
+
+    /**
+     * DB transaction sederhana
+     *
+     * @param Closure $fn
+     * @return void
+     */
+    public static function transaction(Closure $fn): void
+    {
+        try {
+            self::beginTransaction();
+            $fn();
+            self::commit();
+        } catch (Exception $e) {
+            self::rollBack();
+            self::exception($e);
+        }
     }
 }

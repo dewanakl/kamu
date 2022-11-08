@@ -42,13 +42,6 @@ class Router
     private $middleware;
 
     /**
-     * Jadikan objek tunggal
-     * 
-     * @var Router $self
-     */
-    private static $self;
-
-    /**
      * Init object
      * 
      * @return void
@@ -57,20 +50,6 @@ class Router
     {
         $this->routes = [];
         $this->middleware = [];
-    }
-
-    /**
-     * Buat objek yang tunggal
-     *
-     * @return Router
-     */
-    public static function self(): Router
-    {
-        if (!(self::$self instanceof Router)) {
-            self::$self = new self();
-        }
-
-        return self::$self;
     }
 
     /**

@@ -30,13 +30,6 @@ class DataBase
     private $stmt;
 
     /**
-     * Apakah transaksi
-     * 
-     * @var bool $transaction
-     */
-    private $transaction;
-
-    /**
      * Buat objek database
      *
      * @return void
@@ -59,21 +52,11 @@ class DataBase
         ];
 
         try {
-            if (empty($this->pdo)) {
+            if (is_null($this->pdo)) {
                 $this->pdo = new PDO($dsn, env('DB_USER'), env('DB_PASS'), $option);
             }
-
-            $this->transaction = false;
         } catch (PDOException $e) {
-            try {
-                if (DEBUG) {
-                    $this->queryException($e);
-                }
-            } catch (Throwable) {
-                $this->queryException($e);
-            }
-
-            return unavailable();
+            $this->catchException($e);
         }
     }
 
@@ -92,52 +75,68 @@ class DataBase
     }
 
     /**
+     * Tangkap errornya
+     *
+     * @param mixed $e
+     * @return void
+     */
+    public function catchException(mixed $e): void
+    {
+        if (defined('DEBUG')) {
+            if (DEBUG) {
+                $this->queryException($e);
+            }
+
+            unavailable();
+        }
+
+        $this->queryException($e);
+    }
+
+    /**
      * Mulai transaksinya
      *
      * @return bool
      */
-    public function startTransaction(): bool
+    public function beginTransaction(): bool
     {
-        $this->transaction = true;
         return $this->pdo->beginTransaction();
     }
 
     /**
-     * Akhiri transaksinya
+     * Commit transaksinya
      *
      * @return bool
      */
-    public function endTransaction(): bool
+    public function commit(): bool
     {
-        if ($this->transaction) {
-            return $this->pdo->commit();
-        }
+        return $this->pdo->commit();
+    }
 
-        return false;
+    /**
+     * Kembalikan transaksinya
+     *
+     * @return bool
+     */
+    public function rollBack(): bool
+    {
+        return $this->pdo->rollBack();
     }
 
     /**
      * Eksekusi raw sql
      *
      * @param string $command
-     * @return int|false
+     * @return mixed
      * 
-     * @throws PDOException
+     * @throws Throwable
      */
-    public function exec(string $command): int|false
+    public function exec(string $command): mixed
     {
         try {
             return $this->pdo->exec($command);
-        } catch (PDOException $e) {
-            try {
-                if (DEBUG) {
-                    $this->queryException($e);
-                }
-            } catch (Throwable) {
-                $this->queryException($e);
-            }
-
-            return false;
+        } catch (Throwable $e) {
+            $this->catchException($e);
         }
     }
 
@@ -194,19 +193,7 @@ class DataBase
         try {
             return $this->stmt->execute();
         } catch (Exception $e) {
-            if ($this->transaction) {
-                $this->pdo->rollBack();
-            }
-
-            try {
-                if (DEBUG) {
-                    $this->queryException($e);
-                }
-            } catch (Throwable) {
-                $this->queryException($e);
-            }
-
-            return unavailable();
+            $this->catchException($e);
         }
     }
 

@@ -6,8 +6,8 @@ define('START_TIME', microtime(true));
 require_once 'app/Kernel.php';
 
 /**
- * Create kernel this console application then
- * Make console object and run it
+ * Create this console application kernel then
+ * Create console object and run
  * 
  * it's simple
  */

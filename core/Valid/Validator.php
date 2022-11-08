@@ -242,13 +242,13 @@ class Validator
      *
      * @param string $param
      * @param string $alert
-     * @param string|int $optional
+     * @param mixed $optional
      * @return void
      */
-    private function setError(string $param, string $alert, string|int $optional = null): void
+    private function setError(string $param, string $alert, mixed $optional = null): void
     {
         if (empty($this->errors[$param])) {
-            $this->errors[$param] = "$param $alert" . ($optional ? " $optional" : null);
+            $this->errors[$param] = "$param $alert" . ($optional ? " " . strval($optional) : null);
         }
     }
 
