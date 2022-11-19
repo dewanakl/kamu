@@ -73,7 +73,7 @@ class Validator
     {
         switch (true) {
             case $rule == 'required':
-                if (!$this->__isset($param) || empty($value ? trim($value) : $value)) {
+                if (!$this->__isset($param) || empty(trim(strval($value)))) {
                     $this->setError($param, 'dibutuhkan !');
                 }
                 break;
@@ -121,6 +121,10 @@ class Validator
                 $this->__set($param, strval($value));
                 break;
 
+            case $rule == 'bool':
+                $this->__set($param, boolval($value));
+                break;
+
             case $rule == 'slug':
                 $this->__set($param, preg_replace('/[^\w-]/', '', $value));
                 break;
@@ -130,7 +134,7 @@ class Validator
                 break;
 
             case $rule == 'trim':
-                $this->__set($param, $value ? trim($value) : $value);
+                $this->__set($param, trim($value));
                 break;
 
             case str_contains($rule, 'min'):
