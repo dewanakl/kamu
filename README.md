@@ -1,6 +1,7 @@
 ## About Kamu
 
-Kamu adalah framework yang sangat sederhana. Saking sederhananya, dokumentasinya juga apa adanya :)
+Kamu adalah PHP framework yang sangat sederhana. Saking sederhananya, serasa di localhost !!! \
+Dibantu dengan saya console untuk mempermudah dalam develop aplikasi kamu.
 
 > Intinya mirip dengan laravel, karena terinspirasi darinya
 
@@ -15,7 +16,6 @@ Kamu adalah framework yang sangat sederhana. Saking sederhananya, dokumentasinya
 ## Todo list
 
 - [ ] Security check
-- [ ] API Improvement
 
 ## Warning
 
