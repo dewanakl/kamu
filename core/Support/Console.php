@@ -239,7 +239,7 @@ class Console
     private function createMigrasi(?string $name): void
     {
         $data = $this->loadTemplate($name, 1);
-        $data = str_contains(strtolower($name), 'add') ? $data[1] : $data[0];
+        $data = substr_count($name, '_') != 1 ? $data[1] : $data[0];
         $data = str_replace('NAME', explode('_', $name)[count(explode('_', $name)) - 1], $data);
         $this->saveTemplate($name, $data, 1);
     }
