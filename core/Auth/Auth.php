@@ -6,6 +6,10 @@ use Core\Facades\App;
 
 /**
  * Helper class Autentikasi
+ * 
+ * TODO : isi ini
+ * @method static bool check()
+ * @see \Core\Auth\AuthManager
  *
  * @class Auth
  * @package Core\Auth

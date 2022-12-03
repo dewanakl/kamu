@@ -274,9 +274,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
     /**
      * Refresh attributnya
      *
-     * @return self
+     * @return BaseModel
      */
-    public function refresh(): self
+    public function refresh(): BaseModel
     {
         return $this->find($this->__get($this->primaryKey));
     }
@@ -288,9 +288,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      * @param mixed $value
      * @param string $statment
      * @param string $agr
-     * @return self
+     * @return BaseModel
      */
-    public function where(string $column, mixed $value, string $statment = '=', string $agr = 'AND'): self
+    public function where(string $column, mixed $value, string $statment = '=', string $agr = 'AND'): BaseModel
     {
         if (!$this->query && !$this->param) {
             $this->query = 'SELECT * FROM ' . $this->table;
@@ -300,7 +300,7 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
             $agr = 'WHERE';
         }
 
-        $replaceColumn = str_replace('.', '', $column);
+        $replaceColumn = str_replace('.', '_', $column);
 
         $this->query = $this->query . " $agr $column $statment :" .  $replaceColumn;
         $this->param[$replaceColumn] = $value;
@@ -316,9 +316,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      * @param string $refers
      * @param string $param
      * @param string $type
-     * @return self
+     * @return BaseModel
      */
-    public function join(string $table, string $column, string $refers, string $param = '=', string $type = 'INNER'): self
+    public function join(string $table, string $column, string $refers, string $param = '=', string $type = 'INNER'): BaseModel
     {
         $this->query = $this->query . " $type JOIN $table ON $column $param $refers";
         return $this;
@@ -331,9 +331,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      * @param string $column
      * @param string $refers
      * @param string $param
-     * @return self
+     * @return BaseModel
      */
-    public function leftJoin(string $table, string $column, string $refers, string $param = '='): self
+    public function leftJoin(string $table, string $column, string $refers, string $param = '='): BaseModel
     {
         return $this->join($table, $column, $refers, $param, 'LEFT');
     }
@@ -345,9 +345,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      * @param string $column
      * @param string $refers
      * @param string $param
-     * @return self
+     * @return BaseModel
      */
-    public function rightJoin(string $table, string $column, string $refers, string $param = '='): self
+    public function rightJoin(string $table, string $column, string $refers, string $param = '='): BaseModel
     {
         return $this->join($table, $column, $refers, $param, 'RIGHT');
     }
@@ -359,9 +359,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      * @param string $column
      * @param string $refers
      * @param string $param
-     * @return self
+     * @return BaseModel
      */
-    public function fullJoin(string $table, string $column, string $refers, string $param = '='): self
+    public function fullJoin(string $table, string $column, string $refers, string $param = '='): BaseModel
     {
         return $this->join($table, $column, $refers, $param, 'FULL OUTER');
     }
@@ -371,9 +371,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      *
      * @param string $name
      * @param string $order
-     * @return self
+     * @return BaseModel
      */
-    public function orderBy(string $name, string $order = 'ASC'): self
+    public function orderBy(string $name, string $order = 'ASC'): BaseModel
     {
         $agr = str_contains($this->query, 'ORDER BY') ? ', ' : ' ORDER BY ';
         $this->query = $this->query . $agr . $name . ' ' . strtoupper($order);
@@ -385,9 +385,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      * Group By syntax sql
      *
      * @param string $param
-     * @return self
+     * @return BaseModel
      */
-    public function groupBy(string ...$param): self
+    public function groupBy(string ...$param): BaseModel
     {
         $this->query = $this->query . ' GROUP BY ' . implode(', ', $param);
         return $this;
@@ -397,9 +397,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      * Having syntax sql
      *
      * @param string $param
-     * @return self
+     * @return BaseModel
      */
-    public function having(string $param): self
+    public function having(string $param): BaseModel
     {
         $this->query = $this->query . ' HAVING ' . $param;
         return $this;
@@ -409,9 +409,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      * Limit syntax sql
      *
      * @param int $param
-     * @return self
+     * @return BaseModel
      */
-    public function limit(int $param): self
+    public function limit(int $param): BaseModel
     {
         $this->query = $this->query . ' LIMIT ' . $param;
         return $this;
@@ -421,9 +421,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      * Offset syntax sql
      *
      * @param int $param
-     * @return self
+     * @return BaseModel
      */
-    public function offset(int $param): self
+    public function offset(int $param): BaseModel
     {
         $this->query = $this->query . ' OFFSET ' . $param;
         return $this;
@@ -433,19 +433,76 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      * Select raw syntax sql
      *
      * @param string|array $param
-     * @return self
+     * @return BaseModel
      */
-    public function select(string|array ...$param): self
+    public function select(string|array ...$param): BaseModel
     {
         if (is_array($param[0])) {
             $param = $param[0];
         }
 
         $this->checkSelect();
-        $param = implode(', ', $param);
+        $data = explode(' FROM', $this->query);
 
-        $this->query = str_replace('SELECT * FROM', "SELECT $param FROM", $this->query);
+        $this->query = $data[0] . (str_contains($this->query, 'SELECT *') ? ' ' : ', ') . implode(', ', $param) . ' FROM' . $data[1];
+        $this->query = str_replace('SELECT *', 'SELECT', $this->query);
+
         return $this;
+    }
+
+    /**
+     * Count sql aggregate
+     *
+     * @param string $name
+     * @return BaseModel
+     */
+    public function counts(string $name = '*'): BaseModel
+    {
+        return $this->select('COUNT(' . $name . ')' . ($name == '*' ? null : ' AS ' . $name));
+    }
+
+    /**
+     * Max sql aggregate
+     *
+     * @param string $name
+     * @return BaseModel
+     */
+    public function max(string $name): BaseModel
+    {
+        return $this->select('MAX(' . $name . ') AS ' . $name);
+    }
+
+    /**
+     * Min sql aggregate
+     *
+     * @param string $name
+     * @return BaseModel
+     */
+    public function min(string $name): BaseModel
+    {
+        return $this->select('MIN(' . $name . ') AS ' . $name);
+    }
+
+    /**
+     * Avg sql aggregate
+     *
+     * @param string $name
+     * @return BaseModel
+     */
+    public function avg(string $name): BaseModel
+    {
+        return $this->select('AVG(' . $name . ') AS ' . $name);
+    }
+
+    /**
+     * Sum sql aggregate
+     *
+     * @param string $name
+     * @return BaseModel
+     */
+    public function sum(string $name): BaseModel
+    {
+        return $this->select('SUM(' . $name . ') AS ' . $name);
     }
 
     /**
@@ -461,9 +518,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
     /**
      * Ambil semua data
      *
-     * @return self
+     * @return BaseModel
      */
-    public function get(): self
+    public function get(): BaseModel
     {
         $this->checkSelect();
 
@@ -476,9 +533,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
     /**
      * Ambil satu data aja paling atas
      *
-     * @return self
+     * @return BaseModel
      */
-    public function first(): self
+    public function first(): BaseModel
     {
         $this->checkSelect();
 
@@ -518,9 +575,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      *
      * @param mixed $id
      * @param ?string $where
-     * @return self
+     * @return BaseModel
      */
-    public function find(mixed $id, ?string $where = null): self
+    public function find(mixed $id, ?string $where = null): BaseModel
     {
         return $this->where(is_null($where) ? $this->primaryKey : $where, $id)->limit(1)->first();
     }
@@ -530,9 +587,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      *
      * @param mixed $id
      * @param ?string $where
-     * @return self
+     * @return mixed
      */
-    public function findOrFail(mixed $id, ?string $where = null): self
+    public function findOrFail(mixed $id, ?string $where = null): mixed
     {
         return $this->where(is_null($where) ? $this->primaryKey : $where, $id)->limit(1)->firstOrFail();
     }
@@ -554,11 +611,22 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
     }
 
     /**
+     * Delete by id primary key
+     *
+     * @param int $id
+     * @return bool
+     */
+    public function destroy(int $id): bool
+    {
+        return $this->where($this->primaryKey, $id)->delete();
+    }
+
+    /**
      * Ambil semua datanya dari tabel ini
      *
-     * @return self
+     * @return BaseModel
      */
-    public function all(): self
+    public function all(): BaseModel
     {
         return $this->get();
     }
@@ -642,9 +710,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      * Ambil sebagian dari attribute
      * 
      * @param array $only
-     * @return self
+     * @return BaseModel
      */
-    public function only(array $only): self
+    public function only(array $only): BaseModel
     {
         $temp = [];
         foreach ($only as $ol) {
@@ -660,9 +728,9 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      * Ambil kecuali dari attribute
      * 
      * @param array $except
-     * @return self
+     * @return BaseModel
      */
-    public function except(array $except): self
+    public function except(array $except): BaseModel
     {
         $temp = [];
         foreach ($this->attribute() as $key => $value) {

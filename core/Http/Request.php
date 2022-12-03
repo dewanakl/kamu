@@ -4,6 +4,7 @@ namespace Core\Http;
 
 use Core\File\File;
 use Core\Valid\Validator;
+use Exception;
 
 /**
  * Request yang masuk
@@ -104,9 +105,9 @@ class Request
     /**
      * Dapatkan ipnya
      *
-     * @return string
+     * @return string|null
      */
-    public function ip(): string
+    public function ip(): string|null
     {
         if ($this->server('HTTP_CLIENT_IP')) {
             return $this->server('HTTP_CLIENT_IP');
@@ -140,6 +141,8 @@ class Request
         if ($this->server('REMOTE_ADDR')) {
             return $this->server('REMOTE_ADDR');
         }
+
+        return null;
     }
 
     /**
@@ -159,12 +162,21 @@ class Request
     /**
      * Tampilkan error secara manual
      *
-     * @param array $error
+     * @param array|Validator $error
      * @return void
      */
-    public function throw(array $error = []): void
+    public function throw(array|Validator $error): void
     {
-        $this->validator->throw($error);
+        if ($error instanceof Validator) {
+            if ($this->validator instanceof Validator) {
+                throw new Exception('Terdapat 2 object validator !');
+            }
+
+            $this->validator = $error;
+        } else {
+            $this->validator->throw($error);
+        }
+
         $this->fails();
     }
 

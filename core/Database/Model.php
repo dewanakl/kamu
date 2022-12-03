@@ -9,6 +9,10 @@ use ReflectionException;
 
 /**
  * Representasi model database
+ * 
+ * TODO : isi ini
+ * @method static \Core\Database\BaseModel where(string $column, mixed $value, string $statment = '=', string $agr = 'AND')
+ * @see \Core\Database\BaseModel
  *
  * @class Model
  * @package Core\Database

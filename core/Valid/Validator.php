@@ -317,7 +317,7 @@ class Validator
      * @param array $error
      * @return void
      */
-    public function throw(array $error): void
+    public function throw(array $error = []): void
     {
         $this->errors = array_merge($this->failed(), $error);
     }

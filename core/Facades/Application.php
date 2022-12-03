@@ -120,26 +120,32 @@ class Application
     /**
      * Inject objek pada suatu fungsi yang akan di eksekusi
      *
-     * @param string $name
+     * @param string|object $name
      * @param string $method
      * @param array $value
      * @return mixed
      * 
      * @throws Exception
      */
-    public function invoke(string $name, string $method, array $value = []): mixed
+    public function invoke(string|object $name, string $method, array $value = []): mixed
     {
-        $name = $this->singleton($name);
+        if (!is_object($name)) {
+            $name = $this->singleton($name);
+        }
 
-        $reflector = new ReflectionClass($name);
-        $params = $this->getDependencies($reflector->getMethod($method)->getParameters(), $value);
+        $result = null;
 
         try {
+            $reflector = new ReflectionClass($name);
             $reflectionMethod = new ReflectionMethod($name, $method);
-            return $reflectionMethod->invokeArgs($name, $params);
+
+            $params = $this->getDependencies($reflector->getMethod($method)->getParameters(), $value);
+            $result = $reflectionMethod->invokeArgs($name, $params);
         } catch (ReflectionException $e) {
             throw new Exception($e->getMessage());
         }
+
+        return $result;
     }
 
     /**
@@ -165,12 +171,16 @@ class Application
      */
     public function resolve(Closure $name): mixed
     {
+        $result = null;
+
         try {
             $reflector = new ReflectionFunction($name);
-            return $reflector->invokeArgs($this->getDependencies($reflector->getParameters(), array($this)));
+            $result = $reflector->invokeArgs($this->getDependencies($reflector->getParameters(), array($this)));
         } catch (ReflectionException $e) {
             throw new Exception($e->getMessage());
         }
+
+        return $result;
     }
 
     /**
