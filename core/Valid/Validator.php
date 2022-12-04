@@ -263,7 +263,7 @@ class Validator
      * @param array $rules
      * @return Validator
      */
-    public static function make(array $data, array $rule): self
+    public static function make(array $data, array $rule): Validator
     {
         return new self($data, $rule);
     }
@@ -369,11 +369,11 @@ class Validator
     /**
      * Ambil nilai dari data ini
      *
-     * @param ?string $name
+     * @param mixed $name
      * @param mixed $defaultValue
      * @return mixed
      */
-    public function get(?string $name = null, mixed $defaultValue = null): mixed
+    public function get(mixed $name = null, mixed $defaultValue = null): mixed
     {
         if ($name === null) {
             return $this->data;

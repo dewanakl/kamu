@@ -42,9 +42,9 @@ class Respond
      * Alihkan halaman
      * 
      * @param string $prm
-     * @return self
+     * @return Respond
      */
-    public function to(string $prm): self
+    public function to(string $prm): Respond
     {
         $this->redirect = $prm;
         return $this;
@@ -55,9 +55,9 @@ class Respond
      * 
      * @param string $key
      * @param string $value
-     * @return self
+     * @return Respond
      */
-    public function with(string $key, string $value): self
+    public function with(string $key, string $value): Respond
     {
         $this->session->set($key, $value);
         return $this;
@@ -66,9 +66,9 @@ class Respond
     /**
      * Kembali ke halaman yang dulu
      * 
-     * @return self
+     * @return Respond
      */
-    public function back(): self
+    public function back(): Respond
     {
         return $this->to($this->session->get('_oldroute', '/'));
     }
@@ -125,6 +125,8 @@ class Respond
         if (!is_null($respond)) {
             dd($respond);
         }
+
+        $this->terminate();
     }
 
     /**

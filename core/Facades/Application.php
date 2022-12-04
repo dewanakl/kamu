@@ -165,17 +165,18 @@ class Application
      * Inject objek pada suatu closure fungsi
      *
      * @param Closure $name
+     * @param array $param
      * @return mixed
      * 
      * @throws Exception
      */
-    public function resolve(Closure $name): mixed
+    public function resolve(Closure $name, array $param = []): mixed
     {
         $result = null;
 
         try {
             $reflector = new ReflectionFunction($name);
-            $result = $reflector->invokeArgs($this->getDependencies($reflector->getParameters(), array($this)));
+            $result = $reflector->invokeArgs($this->getDependencies($reflector->getParameters(), $param));
         } catch (ReflectionException $e) {
             throw new Exception($e->getMessage());
         }
@@ -196,7 +197,7 @@ class Application
     {
         if (empty($this->objectPool[$interface])) {
             if ($class instanceof Closure) {
-                $result = $this->resolve($class);
+                $result = $this->resolve($class, array($this));
 
                 if (!is_object($result)) {
                     throw new InvalidArgumentException('Return value harus sebuah object !');

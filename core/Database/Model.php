@@ -30,16 +30,18 @@ abstract class Model
      */
     protected static function getPropertyChild(string $class, string $name): mixed
     {
-        $reflect = new ReflectionClass($class);
+        $result = null;
 
         try {
+            $reflect = new ReflectionClass($class);
             $property = $reflect->getProperty($name);
             $property->setAccessible(true);
+            $result = $property->getValue($reflect->newInstance());
         } catch (ReflectionException $e) {
             throw new Exception($e->getMessage());
         }
 
-        return $property->getValue($reflect->newInstance());
+        return $result;
     }
 
     /**

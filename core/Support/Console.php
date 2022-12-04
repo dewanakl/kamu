@@ -107,10 +107,10 @@ class Console
      *
      * @param string $message
      * @param bool $fail
-     * @param ?string $options
+     * @param mixed $options
      * @return void
      */
-    private function exception(string $message, bool $fail = true, ?string $options = null): void
+    private function exception(string $message, bool $fail = true, mixed $options = null): void
     {
         if ($fail) {
             print($this->createColor('red', $message . "\n"));
@@ -172,11 +172,11 @@ class Console
     /**
      * Load template file
      *
-     * @param ?string $name
+     * @param mixed $name
      * @param int $tipe
      * @return mixed
      */
-    private function loadTemplate(?string $name, int $tipe): mixed
+    private function loadTemplate(mixed $name, int $tipe): mixed
     {
         $this->exception('Butuh Nama file !', !$name);
         $type = '';
@@ -233,10 +233,10 @@ class Console
     /**
      * Buat file migrasi
      *
-     * @param ?string $name
+     * @param mixed $name
      * @return void
      */
-    private function createMigrasi(?string $name): void
+    private function createMigrasi(mixed $name): void
     {
         $data = $this->loadTemplate($name, 1);
         $data = substr_count($name, '_') != 1 ? $data[1] : $data[0];
@@ -247,10 +247,10 @@ class Console
     /**
      * Buat file middleware
      *
-     * @param ?string $name
+     * @param mixed $name
      * @return void
      */
-    private function createMiddleware(?string $name): void
+    private function createMiddleware(mixed $name): void
     {
         $data = $this->loadTemplate($name, 2);
         $data = str_replace('NAME', $name, $data);
@@ -260,10 +260,10 @@ class Console
     /**
      * Buat file controller
      *
-     * @param ?string $name
+     * @param mixed $name
      * @return void
      */
-    private function createController(?string $name): void
+    private function createController(mixed $name): void
     {
         $data = $this->loadTemplate($name, 3);
         $data = str_replace('NAME', $name, $data);
@@ -273,10 +273,10 @@ class Console
     /**
      * Buat file model
      *
-     * @param ?string $name
+     * @param mixed $name
      * @return void
      */
-    private function createModel(?string $name): void
+    private function createModel(mixed $name): void
     {
         $data = $this->loadTemplate($name, 4);
         $data = str_replace('NAME', $name, $data);
@@ -287,10 +287,10 @@ class Console
     /**
      * Buat file mail
      *
-     * @param ?string $name
+     * @param mixed $name
      * @return void
      */
-    private function createMail(?string $name): void
+    private function createMail(mixed $name): void
     {
         $this->exception('Butuh Nama file !', !$name);
         $folder =  __DIR__ . '/../../views/email/';

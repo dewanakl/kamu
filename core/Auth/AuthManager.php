@@ -47,11 +47,22 @@ class AuthManager
      */
     public function check(): bool
     {
-        $user = $this->user();
-        return is_null($user) ? false : !empty($user->fail(function () {
-            $this->logout();
-            return false;
-        }));
+        return empty($this->user()) ? false : !empty($this->user->fail(
+            function () {
+                $this->logout();
+                return false;
+            }
+        ));
+    }
+
+    /**
+     * Dapatkan id usernya
+     * 
+     * @return int|null
+     */
+    public function id(): int|null
+    {
+        return empty($this->user) ? null : intval($this->user->{$this->user->getPrimaryKey()});
     }
 
     /**

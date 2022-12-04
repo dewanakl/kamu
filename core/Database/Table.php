@@ -158,9 +158,9 @@ class Table
      * 
      * @param string $name
      * @param int $len
-     * @return self
+     * @return Table
      */
-    public function string(string $name, int $len = 255): self
+    public function string(string $name, int $len = 255): Table
     {
         $this->query[] = "$name VARCHAR($len) NOT NULL";
         $this->columns[] = $name;
@@ -171,9 +171,9 @@ class Table
      * Tipe integer
      * 
      * @param string $name
-     * @return self
+     * @return Table
      */
-    public function integer(string $name): self
+    public function integer(string $name): Table
     {
         if ($this->type == 'pgsql') {
             $this->query[] = "$name BIGINT NOT NULL";
@@ -188,9 +188,9 @@ class Table
      * Tipe text
      * 
      * @param string $name
-     * @return self
+     * @return Table
      */
-    public function text(string $name): self
+    public function text(string $name): Table
     {
         $this->query[] = "$name TEXT NOT NULL";
         $this->columns[] = $name;
@@ -201,9 +201,9 @@ class Table
      * Tipe boolean
      * 
      * @param string $name
-     * @return self
+     * @return Table
      */
-    public function boolean(string $name): self
+    public function boolean(string $name): Table
     {
         $this->query[] = "$name BOOLEAN NOT NULL";
         $this->columns[] = $name;
@@ -214,9 +214,9 @@ class Table
      * Tipe timestamp / datetime
      * 
      * @param string $name
-     * @return self
+     * @return Table
      */
-    public function dateTime(string $name): self
+    public function dateTime(string $name): Table
     {
         if ($this->type == 'pgsql') {
             $this->query[] = "$name TIMESTAMP WITHOUT TIME ZONE NOT NULL";
@@ -248,9 +248,9 @@ class Table
     /**
      * Boleh kosong
      * 
-     * @return self
+     * @return Table
      */
-    public function nullable(): self
+    public function nullable(): Table
     {
         $this->query[$this->getLastArray()] = str_replace('NOT NULL', 'NULL', end($this->query));
         return $this;
@@ -283,9 +283,9 @@ class Table
      * Bikin relasi antara nama attribute
      * 
      * @param string $name
-     * @return self
+     * @return Table
      */
-    public function foreign(string $name): self
+    public function foreign(string $name): Table
     {
         $this->query[] = 'CONSTRAINT FK_' . $this->table . "_$name FOREIGN KEY($name)";
         return $this;
@@ -295,9 +295,9 @@ class Table
      * Dengan nama attribute tabel targetnya
      * 
      * @param string $name
-     * @return self
+     * @return Table
      */
-    public function references(string $name): self
+    public function references(string $name): Table
     {
         $this->query[$this->getLastArray()] = end($this->query) . " REFERENCES TABLE-TARGET($name)";
         return $this;
@@ -307,9 +307,9 @@ class Table
      * Nama tabel targetnya
      * 
      * @param string $name
-     * @return self
+     * @return Table
      */
-    public function on(string $name): self
+    public function on(string $name): Table
     {
         $this->query[$this->getLastArray()] = str_replace('TABLE-TARGET', $name, end($this->query));
         return $this;

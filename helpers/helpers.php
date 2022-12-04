@@ -13,10 +13,10 @@ if (!function_exists('app')) {
     /**
      * Helper method untuk membuat objek secara tunggal
      * 
-     * @param ?string $class
+     * @param mixed $class
      * @return object
      */
-    function app(?string $class = null): object
+    function app(mixed $class = null): object
     {
         $app = App::get();
 
@@ -343,11 +343,11 @@ if (!function_exists('error')) {
     /**
      * Dapatkan pesan error dari request yang salah
      * 
-     * @param ?string $key
-     * @param ?string $optional
+     * @param mixed $key
+     * @param mixed $optional
      * @return mixed
      */
-    function error(?string $key = null, ?string $optional = null): mixed
+    function error(mixed $key = null, mixed $optional = null): mixed
     {
         $error = session()->get('error');
 

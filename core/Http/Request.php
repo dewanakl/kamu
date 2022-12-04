@@ -64,11 +64,11 @@ class Request
     /**
      * Ambil nilai dari request ini
      *
-     * @param ?string $name
+     * @param mixed $name
      * @param mixed $defaultValue
      * @return mixed
      */
-    public function get(?string $name = null, mixed $defaultValue = null): mixed
+    public function get(mixed $name = null, mixed $defaultValue = null): mixed
     {
         if ($name === null) {
             return $this->requestData;
@@ -80,10 +80,10 @@ class Request
     /**
      * Ambil nilai dari request server ini
      *
-     * @param ?string $name
+     * @param mixed $name
      * @return mixed
      */
-    public function server(?string $name = null, mixed $defaultValue = null): mixed
+    public function server(mixed $name = null, mixed $defaultValue = null): mixed
     {
         if ($name === null) {
             return $this->serverData;

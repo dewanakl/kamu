@@ -160,10 +160,10 @@ class DataBase
      *
      * @param int|string $param
      * @param mixed $value
-     * @param ?int $type
+     * @param mixed $type
      * @return void
      */
-    public function bind(int|string $param, mixed $value, ?int $type = null): void
+    public function bind(int|string $param, mixed $value, mixed $type = null): void
     {
         if (is_null($type)) {
             switch (true) {
@@ -246,10 +246,10 @@ class DataBase
     /**
      * Dapatkan idnya
      * 
-     * @param ?string $name
+     * @param mixed $name
      * @return string|false
      */
-    public function lastInsertId(?string $name = null): string|false
+    public function lastInsertId(mixed $name = null): string|false
     {
         return $this->pdo->lastInsertId($name);
     }

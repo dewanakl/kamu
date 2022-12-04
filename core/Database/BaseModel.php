@@ -571,27 +571,45 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
     }
 
     /**
+     * Cari model id
+     *
+     * @param mixed $id
+     * @param mixed $where
+     * @return BaseModel
+     * 
+     * @throws Exception
+     */
+    public function id(mixed $id, mixed $where = null): BaseModel
+    {
+        if (empty($this->primaryKey)) {
+            throw new Exception('Primary key tidak terdefinisi !');
+        }
+
+        return $this->where(is_null($where) ? $this->primaryKey : $where, $id);
+    }
+
+    /**
      * Cari berdasarkan id
      *
      * @param mixed $id
-     * @param ?string $where
+     * @param mixed $where
      * @return BaseModel
      */
-    public function find(mixed $id, ?string $where = null): BaseModel
+    public function find(mixed $id, mixed $where = null): BaseModel
     {
-        return $this->where(is_null($where) ? $this->primaryKey : $where, $id)->limit(1)->first();
+        return $this->id($id, $where)->limit(1)->first();
     }
 
     /**
      * Cari berdasarkan id atau error "tidak ada"
      *
      * @param mixed $id
-     * @param ?string $where
+     * @param mixed $where
      * @return mixed
      */
-    public function findOrFail(mixed $id, ?string $where = null): mixed
+    public function findOrFail(mixed $id, mixed $where = null): mixed
     {
-        return $this->where(is_null($where) ? $this->primaryKey : $where, $id)->limit(1)->firstOrFail();
+        return $this->id($id, $where)->limit(1)->firstOrFail();
     }
 
     /**
@@ -607,7 +625,7 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
             throw new Exception('Nilai primary key tidak ada !');
         }
 
-        return $this->where($this->primaryKey, $this->__get($this->primaryKey))->update($this->except([$this->primaryKey])->attribute());
+        return $this->id($this->__get($this->primaryKey))->update($this->except([$this->primaryKey])->attribute());
     }
 
     /**
@@ -618,7 +636,7 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      */
     public function destroy(int $id): bool
     {
-        return $this->where($this->primaryKey, $id)->delete();
+        return $this->id($id)->delete();
     }
 
     /**

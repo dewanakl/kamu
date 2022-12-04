@@ -216,7 +216,7 @@ class Mail
      * @param mixed $name
      * @return Mail
      */
-    public function addTo(string $address, mixed $name = null): self
+    public function addTo(string $address, mixed $name = null): Mail
     {
         $this->to[] = array($address, $name);
 
@@ -229,7 +229,7 @@ class Mail
      * @param string $subject
      * @return Mail
      */
-    public function subjek(string $subject): self
+    public function subjek(string $subject): Mail
     {
         $this->subject = $subject;
 
@@ -242,7 +242,7 @@ class Mail
      * @param mixed $message
      * @return Mail
      */
-    public function pesan(mixed $message): self
+    public function pesan(mixed $message): Mail
     {
         $this->htmlMessage = strval($message);
 
