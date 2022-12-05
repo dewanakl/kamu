@@ -94,7 +94,7 @@ class Table
      */
     public function export(): string|null
     {
-        if ($this->alter != null) {
+        if ($this->alter == 'ADD') {
             $db = app(DataBase::class);
 
             foreach ($this->columns as $value) {
@@ -113,6 +113,16 @@ class Table
                     $this->alter = null;
                     $this->columns = [];
                     return null;
+                }
+            }
+        }
+
+        if ($this->alter == 'ALTER COLUMN') {
+            foreach ($this->columns as $c) {
+                foreach ($this->query as $i => $q) {
+                    if (str_contains($q, $c)) {
+                        $this->query[$i] = $c . ' TYPE ' . explode(' ', explode($c, $q)[1])[1];
+                    }
                 }
             }
         }
@@ -252,7 +262,7 @@ class Table
      */
     public function nullable(): Table
     {
-        $this->query[$this->getLastArray()] = str_replace('NOT NULL', 'NULL', end($this->query));
+        $this->query[$this->getLastArray()] = str_replace('NOT NULL', '', end($this->query));
         return $this;
     }
 
@@ -361,5 +371,22 @@ class Table
         $this->alter = 'RENAME';
         $this->query[$this->getLastArray()] = $from . ' TO ' . $to;
         $this->columns[] = $from;
+    }
+
+    /**
+     * Edit kolomnya
+     * 
+     * @param Closure $fn
+     * @return void
+     */
+    public function changeColumn(Closure $fn): void
+    {
+        if ($this->type == 'mysql') {
+            $this->alter = 'MODIFY COLUMN';
+        } else {
+            $this->alter = 'ALTER COLUMN';
+        }
+
+        $fn($this);
     }
 }

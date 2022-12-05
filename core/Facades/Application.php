@@ -58,11 +58,11 @@ class Application
     /**
      * Cek apa aja yang dibutuhkan untuk injek objek atau parameter
      *
-     * @param ?array $parameters
+     * @param mixed $parameters
      * @param array $value
      * @return array
      */
-    private function getDependencies(?array $parameters = null, array $value = []): array
+    private function getDependencies(mixed $parameters = null, array $value = []): array
     {
         $args = [];
         $paramid = 0;

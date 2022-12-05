@@ -2,17 +2,20 @@
 
 namespace Core\Auth;
 
-use Core\Facades\App;
-
 /**
  * Helper class Autentikasi
  * 
- * TODO : isi ini
  * @method static bool check()
+ * @method static int|null id()
+ * @method static \Core\Database\BaseModel|null user()
+ * @method static void logout()
+ * @method static void login(object $user)
+ * @method static bool attempt(array $credential, string $model = 'Models\User')
+ * 
  * @see \Core\Auth\AuthManager
  *
  * @class Auth
- * @package Core\Auth
+ * @package \Core\Auth
  */
 final class Auth
 {
@@ -25,7 +28,7 @@ final class Auth
      */
     private static function call(string $method, array $parameters): mixed
     {
-        return App::get()->invoke(AuthManager::class, $method, $parameters);
+        return app()->invoke(AuthManager::class, $method, $parameters);
     }
 
     /**

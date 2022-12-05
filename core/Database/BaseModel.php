@@ -546,6 +546,16 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
     }
 
     /**
+     * Ambil semua datanya dari tabel ini
+     *
+     * @return BaseModel
+     */
+    public function all(): BaseModel
+    {
+        return $this->get();
+    }
+
+    /**
      * Ambil atau error "tidak ada"
      *
      * @return mixed
@@ -637,16 +647,6 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
     public function destroy(int $id): bool
     {
         return $this->id($id)->delete();
-    }
-
-    /**
-     * Ambil semua datanya dari tabel ini
-     *
-     * @return BaseModel
-     */
-    public function all(): BaseModel
-    {
-        return $this->get();
     }
 
     /**
