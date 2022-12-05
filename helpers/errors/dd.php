@@ -9,10 +9,13 @@
     <style>
         pre {
             margin: 2rem 1rem;
-            font-size: 14px;
+            padding-left: 0.7rem;
+            font-size: 0.9rem;
             overflow: auto;
             white-space: pre-wrap;
             word-wrap: break-word;
+            border-left-style: solid;
+            border-width: 0.12rem;
         }
     </style>
 </head>

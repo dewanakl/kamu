@@ -7,8 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kamu - Error</title>
     <style>
+        body {
+            margin: 2rem 1rem;
+        }
+
         pre {
-            font-size: 22px;
+            font-size: 1.4rem;
             font-weight: bold;
             overflow: auto;
             white-space: pre-wrap;
@@ -17,7 +21,7 @@
 
         .font {
             font-family: monospace;
-            font-size: 15px;
+            font-size: 0.94rem;
         }
 
         th {
@@ -26,8 +30,8 @@
 
         td {
             text-align: left;
-            height: 25px;
-            border-bottom: 1px solid #bbb;
+            height: 1.55rem;
+            border-bottom: 0.05rem solid #bbb;
         }
 
         tr:hover {

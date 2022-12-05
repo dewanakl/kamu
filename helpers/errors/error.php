@@ -24,7 +24,7 @@
         }
 
         .fof h1 {
-            font-size: 40px;
+            font-size: 2.5rem;
             display: inline-block;
             padding-right: 1rem;
             animation: type .5s alternate infinite;
@@ -32,11 +32,11 @@
 
         @keyframes type {
             from {
-                box-shadow: inset -3px 0px 0px #555;
+                box-shadow: inset -0.2rem 0px 0px #555;
             }
 
             to {
-                box-shadow: inset -3px 0px 0px transparent;
+                box-shadow: inset -0.2rem 0px 0px transparent;
             }
         }
     </style>
