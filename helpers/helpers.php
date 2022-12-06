@@ -308,12 +308,9 @@ if (!function_exists('getPathFromRoute')) {
      */
     function getPathFromRoute(string $name): string
     {
-        $routes = Route::router()->routes();
-
-        foreach ($routes as $route) {
-            $data = $routes[array_search($route, $routes)];
-            if ($data['name'] == $name) {
-                return $data['path'];
+        foreach (Route::router()->routes() as $route) {
+            if ($route['name'] == $name) {
+                return $route['path'];
             }
         }
 
