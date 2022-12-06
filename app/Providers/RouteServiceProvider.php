@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Core\Facades\Provider;
+use Core\Routing\Route;
 use Core\Routing\Router;
 
 class RouteServiceProvider extends Provider
@@ -25,6 +26,6 @@ class RouteServiceProvider extends Provider
     public function booting()
     {
         $this->app->singleton(Router::class);
-        require_once __DIR__ . '/../../routes/routes.php';
+        Route::setRouteFromCacheIfExist();
     }
 }

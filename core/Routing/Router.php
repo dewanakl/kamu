@@ -3,7 +3,6 @@
 namespace Core\Routing;
 
 use Closure;
-use Exception;
 
 /**
  * Class untuk routing dan mengelompokan url
@@ -195,23 +194,14 @@ class Router
     }
 
     /**
-     * Ambil url dalam route dengan nama
+     * Isi semua url yang ada
      *
-     * @param string $name
-     * @return string
-     * 
-     * @throws Exception
+     * @param array $route
+     * @return void
      */
-    public function getPath(string $name): string
+    public function setRoutes(array $route): void
     {
-        foreach ($this->routes as $route) {
-            $id = array_search($route, $this->routes);
-            if ($this->routes[$id]['name'] == $name) {
-                return $this->routes[$id]['path'];
-            }
-        }
-
-        throw new Exception('Route "' . $name . '" tidak ditemukan');
+        $this->routes = $route;
     }
 
     /**

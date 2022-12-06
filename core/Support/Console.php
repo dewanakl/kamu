@@ -2,6 +2,7 @@
 
 namespace Core\Support;
 
+use Core\Routing\Route;
 use Core\Valid\Hash;
 
 /**
@@ -239,7 +240,7 @@ class Console
     private function createMigrasi(mixed $name): void
     {
         $data = $this->loadTemplate($name, 1);
-        $data = substr_count($name, '_') != 1 ? $data[1] : $data[0];
+        $data = substr_count($name, '_') >= 1 ? $data[1] : $data[0];
         $data = str_replace('NAME', explode('_', $name)[count(explode('_', $name)) - 1], $data);
         $this->saveTemplate($name, $data, 1);
     }
@@ -330,6 +331,42 @@ class Console
     }
 
     /**
+     * Create cache route file
+     *
+     * @return void
+     */
+    private function createCache(): void
+    {
+        Route::setRouteFromFile();
+        $route = Route::router()->routes();
+        $data = '<?php return ' . var_export($route, true) . ';';
+
+        $folder =  __DIR__ . '/../../app/cache/';
+        if (!is_dir($folder)) {
+            mkdir($folder, 7777, true);
+        }
+
+        file_put_contents($folder . 'routes.php', $data);
+
+        print("\nCache route siap !" . $this->createColor('green', ' berhasil ') . $this->executeTime());
+    }
+
+    /**
+     * Delete cache route file
+     *
+     * @return void
+     */
+    private function deleteCache(): void
+    {
+        $status = @unlink(__DIR__ . '/../../app/cache/routes.php');
+        if ($status) {
+            print("\nCache dihapus !" . $this->createColor('green', ' berhasil ') . $this->executeTime());
+        } else {
+            $this->exception('file cache tidak ada !');
+        }
+    }
+
+    /**
      * Tampilkan list menu yang ada
      *
      * @return void
@@ -344,6 +381,14 @@ class Console
             [
                 'command' => 'key',
                 'description' => 'Amankan aplikasi ini dengan kunci random'
+            ],
+            [
+                'command' => 'cache',
+                'description' => 'Buat route cache agar lebih cepat'
+            ],
+            [
+                'command' => 'cache:delete',
+                'description' => 'Hapus file cache route tersebut'
             ],
             [
                 'command' => 'migrasi',
@@ -405,6 +450,12 @@ class Console
                 break;
             case 'key':
                 $this->createKey();
+                break;
+            case 'cache':
+                $this->createCache();
+                break;
+            case 'cache:delete':
+                $this->deleteCache();
                 break;
             case 'migrasi':
                 $this->migrasi(true);

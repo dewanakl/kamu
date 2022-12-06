@@ -297,6 +297,30 @@ if (!function_exists('asset')) {
     }
 }
 
+if (!function_exists('getPathFromRoute')) {
+    /**
+     * Ambil url dalam route dengan nama
+     *
+     * @param string $name
+     * @return string
+     * 
+     * @throws Exception
+     */
+    function getPathFromRoute(string $name): string
+    {
+        $routes = Route::router()->routes();
+
+        foreach ($routes as $route) {
+            $data = $routes[array_search($route, $routes)];
+            if ($data['name'] == $name) {
+                return $data['path'];
+            }
+        }
+
+        throw new Exception('Route "' . $name . '" tidak ditemukan');
+    }
+}
+
 if (!function_exists('route')) {
     /**
      * Dapatkan url dari route name dan masukan value
@@ -310,7 +334,7 @@ if (!function_exists('route')) {
     function route(string $param, mixed ...$keys): string
     {
         $regex = '([\w-]*)';
-        $param = Route::getPath($param);
+        $param = getPathFromRoute($param);
 
         foreach ($keys as $key) {
             $pos = strpos($param, $regex);

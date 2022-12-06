@@ -92,14 +92,29 @@ final class Route
     }
 
     /**
-     * Ambil url dalam route dengan nama
+     * Isi url file route
      *
-     * @param string $name
-     * @return string
+     * @return void
      */
-    public static function getPath(string $name): string
+    public static function setRouteFromFile(): void
     {
-        return static::router()->getPath($name);
+        require_once __DIR__ . '/../../routes/routes.php';
+    }
+
+    /**
+     * Isi url dari cache atau route
+     *
+     * @return void
+     */
+    public static function setRouteFromCacheIfExist(): void
+    {
+        $cache = __DIR__ . '/../../app/cache/routes.php';
+        if (!is_readable($cache)) {
+            static::setRouteFromFile();
+        } else {
+            $cache = require_once $cache;
+            static::router()->setRoutes($cache);
+        }
     }
 
     /**
