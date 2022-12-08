@@ -562,7 +562,11 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      */
     public function firstOrFail(): mixed
     {
-        return $this->first()->fail(fn () => notFound());
+        return $this->first()->fail(
+            function () {
+                notFound();
+            }
+        );
     }
 
     /**
