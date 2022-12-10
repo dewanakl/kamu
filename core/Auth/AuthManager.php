@@ -11,7 +11,7 @@ use Exception;
  * Autentikasi user dengan basemodel
  *
  * @class AuthManager
- * @package Core\Auth
+ * @package \Core\Auth
  */
 class AuthManager
 {
@@ -72,14 +72,12 @@ class AuthManager
      */
     public function user(): BaseModel|null
     {
-        if (!empty($this->user)) {
+        if ($this->user instanceof BaseModel) {
             return $this->user;
         }
 
         $user = $this->session->get('_user');
-        if (!empty($user)) {
-            $this->user = unserialize($user)->refresh();
-        }
+        $this->user = empty($user) ? null : unserialize($user)->refresh();
 
         return $this->user;
     }

@@ -223,9 +223,8 @@ class Router
 
         $group();
 
-        foreach ($this->routes as $route) {
+        foreach ($this->routes as $id => $route) {
             if (!in_array($route, $tempRoutes)) {
-                $id = array_search($route, $this->routes);
 
                 if (!is_null($tempController)) {
                     $old = $this->routes[$id]['controller'];

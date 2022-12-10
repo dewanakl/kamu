@@ -99,17 +99,12 @@ class Kernel
     {
         error_reporting(DEBUG ? E_ALL : 0);
 
-        set_exception_handler(function (\Throwable $error) {
-            clear_ob();
-            header('Content-Type: text/html');
-
-            if (!DEBUG) {
-                unavailable();
+        set_exception_handler(function (mixed $error) {
+            if (DEBUG) {
+                trace($error);
             }
 
-            header('HTTP/1.1 500 Internal Server Error', true, 500);
-            echo render('../helpers/errors/trace', compact('error'));
-            exit;
+            unavailable();
         });
     }
 

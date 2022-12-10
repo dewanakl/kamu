@@ -126,6 +126,23 @@ if (!function_exists('e')) {
     }
 }
 
+if (!function_exists('trace')) {
+    /**
+     * Lacak erornya
+     * 
+     * @param mixed $error
+     * @return void
+     */
+    function trace(mixed $error): void
+    {
+        clear_ob();
+        header('Content-Type: text/html');
+        header('HTTP/1.1 500 Internal Server Error', true, 500);
+        echo render('../helpers/errors/trace', ['error' => $error]);
+        exit;
+    }
+}
+
 if (!function_exists('dd')) {
     /**
      * Tampikan hasil debugging
@@ -135,8 +152,8 @@ if (!function_exists('dd')) {
      */
     function dd(mixed ...$param): void
     {
-        header('Content-Type: text/html');
         clear_ob();
+        header('Content-Type: text/html');
         echo render('../helpers/errors/dd', [
             'param' => $param
         ]);
@@ -152,8 +169,9 @@ if (!function_exists('abort')) {
      */
     function abort(): void
     {
-        header('HTTP/1.1 403 Forbidden', true, 403);
         clear_ob();
+        header('Content-Type: text/html');
+        header('HTTP/1.1 403 Forbidden', true, 403);
         echo render('../helpers/errors/error', [
             'pesan' => 'Forbidden 403'
         ]);
@@ -169,8 +187,9 @@ if (!function_exists('notFound')) {
      */
     function notFound(): void
     {
-        header('HTTP/1.1 404 Not Found', true, 404);
         clear_ob();
+        header('Content-Type: text/html');
+        header('HTTP/1.1 404 Not Found', true, 404);
         echo render('../helpers/errors/error', [
             'pesan' => 'Not Found 404'
         ]);
@@ -186,8 +205,9 @@ if (!function_exists('notAllowed')) {
      */
     function notAllowed(): void
     {
-        header('HTTP/1.1 405 Method Not Allowed', true, 405);
         clear_ob();
+        header('Content-Type: text/html');
+        header('HTTP/1.1 405 Method Not Allowed', true, 405);
         echo render('../helpers/errors/error', [
             'pesan' => 'Method Not Allowed 405'
         ]);
@@ -203,8 +223,9 @@ if (!function_exists('pageExpired')) {
      */
     function pageExpired(): void
     {
-        header('HTTP/1.1 400 Bad Request', true, 400);
         clear_ob();
+        header('Content-Type: text/html');
+        header('HTTP/1.1 400 Bad Request', true, 400);
         echo render('../helpers/errors/error', [
             'pesan' => 'Page Expired !'
         ]);
@@ -220,8 +241,9 @@ if (!function_exists('unavailable')) {
      */
     function unavailable(): void
     {
-        header('HTTP/1.1 503 Service Unavailable', true, 503);
         clear_ob();
+        header('Content-Type: text/html');
+        header('HTTP/1.1 503 Service Unavailable', true, 503);
         echo render('../helpers/errors/error', [
             'pesan' => 'Service Unavailable !'
         ]);

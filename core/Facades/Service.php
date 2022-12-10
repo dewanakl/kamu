@@ -176,6 +176,7 @@ class Service
         $routes = Route::router()->routes();
         foreach ($routes as $route) {
             $pattern = '#^' . $route['path'] . '$#';
+            $variables = null;
             if (preg_match($pattern, $path, $variables)) {
                 $routeMatch = true;
                 if ($method == $route['method']) {
