@@ -138,8 +138,7 @@ if (!function_exists('trace')) {
         clear_ob();
         header('Content-Type: text/html');
         header('HTTP/1.1 500 Internal Server Error', true, 500);
-        echo render('../helpers/errors/trace', ['error' => $error]);
-        exit;
+        respond()->send(render('../helpers/errors/trace', ['error' => $error]));
     }
 }
 
@@ -154,10 +153,7 @@ if (!function_exists('dd')) {
     {
         clear_ob();
         header('Content-Type: text/html');
-        echo render('../helpers/errors/dd', [
-            'param' => $param
-        ]);
-        exit;
+        respond()->send(render('../helpers/errors/dd', ['param' => $param]));
     }
 }
 
@@ -172,10 +168,7 @@ if (!function_exists('abort')) {
         clear_ob();
         header('Content-Type: text/html');
         header('HTTP/1.1 403 Forbidden', true, 403);
-        echo render('../helpers/errors/error', [
-            'pesan' => 'Forbidden 403'
-        ]);
-        exit;
+        respond()->send(render('../helpers/errors/error', ['pesan' => 'Forbidden 403']));
     }
 }
 
@@ -190,10 +183,7 @@ if (!function_exists('notFound')) {
         clear_ob();
         header('Content-Type: text/html');
         header('HTTP/1.1 404 Not Found', true, 404);
-        echo render('../helpers/errors/error', [
-            'pesan' => 'Not Found 404'
-        ]);
-        exit;
+        respond()->send(render('../helpers/errors/error', ['pesan' => 'Not Found 404']));
     }
 }
 
@@ -208,10 +198,7 @@ if (!function_exists('notAllowed')) {
         clear_ob();
         header('Content-Type: text/html');
         header('HTTP/1.1 405 Method Not Allowed', true, 405);
-        echo render('../helpers/errors/error', [
-            'pesan' => 'Method Not Allowed 405'
-        ]);
-        exit;
+        respond()->send(render('../helpers/errors/error', ['pesan' => 'Method Not Allowed 405']));
     }
 }
 
@@ -226,10 +213,7 @@ if (!function_exists('pageExpired')) {
         clear_ob();
         header('Content-Type: text/html');
         header('HTTP/1.1 400 Bad Request', true, 400);
-        echo render('../helpers/errors/error', [
-            'pesan' => 'Page Expired !'
-        ]);
-        exit;
+        respond()->send(render('../helpers/errors/error', ['pesan' => 'Page Expired !']));
     }
 }
 
@@ -244,10 +228,7 @@ if (!function_exists('unavailable')) {
         clear_ob();
         header('Content-Type: text/html');
         header('HTTP/1.1 503 Service Unavailable', true, 503);
-        echo render('../helpers/errors/error', [
-            'pesan' => 'Service Unavailable !'
-        ]);
-        exit;
+        respond()->send(render('../helpers/errors/error', ['pesan' => 'Service Unavailable !']));
     }
 }
 

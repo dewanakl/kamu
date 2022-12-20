@@ -15,13 +15,12 @@ trait HasToken
     {
         if (!hash_equals(session()->get('_token'), $token)) {
             session()->unset('_token');
-            session()->send();
 
             if (!$ajax) {
                 pageExpired();
             }
 
-            respond()->terminate(json(['token' => false], 400));
+            respond()->send(json(['token' => false], 400));
         }
 
         if (!$ajax) {

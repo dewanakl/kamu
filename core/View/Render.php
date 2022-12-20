@@ -84,18 +84,15 @@ class Render
      */
     public function show(): void
     {
-        $path = $this->path;
-        $data = $this->variables;
-
-        $this->content = (function () use ($path, $data) {
+        $this->content = (function ($__path, $__data) {
             ob_start();
-            extract($data, EXTR_SKIP);
+            extract($__data, EXTR_SKIP);
 
-            include_once $path;
+            include_once $__path;
             $content = ob_get_contents();
 
             ob_end_clean();
             return $content;
-        })();
+        })($this->path, $this->variables);
     }
 }
