@@ -6,7 +6,7 @@ namespace Core\Facades;
  * Registrasi apa saja sebelum aplikasi berjalan
  *
  * @class Provider
- * @package Core\Facades
+ * @package \Core\Facades
  */
 abstract class Provider
 {

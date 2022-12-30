@@ -6,7 +6,7 @@ namespace Core\Http;
  * Stream sebuah file
  *
  * @class Stream
- * @package Core\Http
+ * @package \Core\Http
  * @see https://gist.github.com/kosinix/4cf0d432638817888149
  */
 class Stream

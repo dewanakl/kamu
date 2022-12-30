@@ -6,7 +6,7 @@ namespace Core\Valid;
  * Validasi sebuah nilai
  * 
  * @class Validator
- * @package Core\Valid
+ * @package \Core\Valid
  */
 class Validator
 {
@@ -320,16 +320,6 @@ class Validator
     public function throw(array $error = []): void
     {
         $this->errors = array_merge($this->failed(), $error);
-    }
-
-    /**
-     * Ambil yang sudah di validasi
-     * 
-     * @return array
-     */
-    public function validated(): array
-    {
-        return $this->get();
     }
 
     /**

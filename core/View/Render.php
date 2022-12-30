@@ -8,7 +8,7 @@ use InvalidArgumentException;
  * Tampilkan html dan juga injek variabel
  *
  * @class Render
- * @package Core\View
+ * @package \Core\View
  */
 class Render
 {
@@ -92,7 +92,7 @@ class Render
             $content = ob_get_contents();
 
             ob_end_clean();
-            return $content;
+            return strval($content);
         })($this->path, $this->variables);
     }
 }

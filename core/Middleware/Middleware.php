@@ -9,7 +9,7 @@ use Core\Http\Request;
  * Middleware - cek dahulu sebelum ke controller
  *
  * @class Middleware
- * @package Core\Middleware
+ * @package \Core\Middleware
  * @see https://github.com/esbenp/onion
  */
 class Middleware

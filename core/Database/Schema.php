@@ -8,7 +8,7 @@ use Closure;
  * Helper class untuk skema tabel
  *
  * @class Schema
- * @package Core\Database
+ * @package \Core\Database
  */
 final class Schema
 {
@@ -23,7 +23,7 @@ final class Schema
     {
         $table = app(Table::class);
         $table->table($name);
-        $attribute($table);
+        app()->resolve($attribute);
 
         app(DataBase::class)->exec($table->create());
     }
@@ -39,7 +39,7 @@ final class Schema
     {
         $table = app(Table::class);
         $table->table($name);
-        $attribute($table);
+        app()->resolve($attribute);
 
         $export = $table->export();
         if ($export) {

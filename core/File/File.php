@@ -9,7 +9,7 @@ use Core\Valid\Hash;
  * File uploaded
  *
  * @class File
- * @package Core\File
+ * @package \Core\File
  */
 class File
 {

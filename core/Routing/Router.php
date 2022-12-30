@@ -8,7 +8,7 @@ use Closure;
  * Class untuk routing dan mengelompokan url
  *
  * @class Router
- * @package Core\Routing
+ * @package \Core\Routing
  */
 class Router
 {
@@ -20,14 +20,14 @@ class Router
     private $routes;
 
     /**
-     * Jika ada controller grup
+     * Jika ada controller group
      * 
      * @var string|null $controller
      */
     private $controller;
 
     /**
-     * Jika ada prefix grup
+     * Jika ada prefix group
      * 
      * @var string|null $prefix
      */

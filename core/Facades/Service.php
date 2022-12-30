@@ -16,7 +16,7 @@ use Middleware\CsrfMiddleware;
  * Class untuk menjalankan middleware dan controller
  *
  * @class Service
- * @package Core\Facades
+ * @package \Core\Facades
  */
 class Service
 {
@@ -107,6 +107,7 @@ class Service
 
         $middleware = new Middleware($middlewarePool);
         $middleware->handle($this->request);
+        unset($middleware);
     }
 
     /**
@@ -165,8 +166,8 @@ class Service
      */
     public function run(): void
     {
-        $path = urldecode(parse_url($this->request->server('REQUEST_URI'), PHP_URL_PATH));
-        $method = strtoupper(strtoupper($this->request->method()) == 'POST'
+        $path = parse_url($this->request->server('REQUEST_URI'), PHP_URL_PATH);
+        $method = strtoupper($this->request->method() == 'POST'
             ? $this->request->get('_method', 'POST')
             : $this->request->method());
 
@@ -177,6 +178,7 @@ class Service
         foreach ($routes as $route) {
             $pattern = '#^' . $route['path'] . '$#';
             $variables = null;
+
             if (preg_match($pattern, $path, $variables)) {
                 $routeMatch = true;
                 if ($method == $route['method']) {

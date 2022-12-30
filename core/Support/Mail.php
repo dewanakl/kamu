@@ -6,7 +6,7 @@ namespace Core\Support;
  * Kirim email dengan SMTP
  *
  * @class Mail
- * @package Core\Support
+ * @package \Core\Support
  * @see https://github.com/snipworks/php-smtp
  */
 class Mail
@@ -256,7 +256,6 @@ class Mail
      */
     public function send(): bool
     {
-        $message = null;
         $this->socket = fsockopen($this->getServer(), $this->port);
 
         if (empty($this->socket)) {
@@ -295,11 +294,10 @@ class Mail
 
         $this->setHeader('Content-Type', 'multipart/alternative; boundary="alt-' . $boundary . '"');
 
-        $message .= '--alt-' . $boundary . self::CRLF;
+        $message = '--alt-' . $boundary . self::CRLF;
         $message .= 'Content-Type: text/html; charset=utf-8' . self::CRLF;
         $message .= 'Content-Transfer-Encoding: base64' . self::CRLF . self::CRLF;
         $message .= chunk_split(base64_encode($this->htmlMessage)) . self::CRLF;
-
         $message .= '--alt-' . $boundary . '--' . self::CRLF . self::CRLF;
 
         $headers = '';
@@ -312,6 +310,6 @@ class Mail
         $this->sendCommand('QUIT');
         fclose($this->socket);
 
-        return substr($result, 0, 3) == 250;
+        return intval(substr($result, 0, 3)) == 250;
     }
 }

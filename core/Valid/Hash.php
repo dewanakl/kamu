@@ -6,7 +6,7 @@ namespace Core\Valid;
  * Encrypt decrypt string
  * 
  * @class Hash
- * @package Core\Valid
+ * @package \Core\Valid
  */
 final class Hash
 {
@@ -15,7 +15,14 @@ final class Hash
      * 
      * @var string CIPHERING
      */
-    public const CIPHERING = 'AES-128-CTR';
+    public const CIPHERING = 'aes-256-cbc';
+
+    /**
+     * Algo Hash
+     * 
+     * @var string HASH
+     */
+    public const HASH = 'sha3-512';
 
     /**
      * Encrypt dengan app key
@@ -26,19 +33,31 @@ final class Hash
     public static function encrypt(string $str): string
     {
         $app = explode(':', env('APP_KEY'));
-        return openssl_encrypt($str, self::CIPHERING, $app[0], 0, $app[1]);
+        $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length(self::CIPHERING));
+        $encrypted = openssl_encrypt($str, self::CIPHERING, $app[1] ?? static::rand(5), OPENSSL_RAW_DATA, $iv);
+
+        return base64_encode($iv . hash_hmac(self::HASH, $encrypted, $app[0], true) . $encrypted);
     }
 
     /**
      * Decrypt dengan app key
      *
      * @param string $str
-     * @return string
+     * @return string|null
      */
-    public static function decrypt(string $str): string
+    public static function decrypt(string $str): string|null
     {
         $app = explode(':', env('APP_KEY'));
-        return openssl_decrypt($str, self::CIPHERING, $app[0], 0, $app[1]);
+        $mix = base64_decode($str);
+
+        $iv = openssl_cipher_iv_length(self::CIPHERING);
+        $encrypted = substr($mix, $iv + 64);
+
+        if (!hash_equals(substr($mix, $iv, 64), hash_hmac(self::HASH, $encrypted, $app[0], true))) {
+            return null;
+        }
+
+        return openssl_decrypt($encrypted, self::CIPHERING, $app[1] ?? static::rand(5), OPENSSL_RAW_DATA, substr($mix, 0, $iv));
     }
 
     /**

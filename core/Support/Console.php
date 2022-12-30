@@ -9,7 +9,7 @@ use Core\Valid\Hash;
  * Saya console untuk mempermudah develop app
  *
  * @class Console
- * @package Core\Support
+ * @package \Core\Support
  */
 class Console
 {

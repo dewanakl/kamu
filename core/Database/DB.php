@@ -9,7 +9,7 @@ use Exception;
  * Helper class DB untuk customizable nama table
  *
  * @class DB
- * @package Core\Database
+ * @package \Core\Database
  */
 final class DB
 {

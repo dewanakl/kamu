@@ -8,7 +8,7 @@ use Core\Valid\Hash;
  * Handle session
  *
  * @class Session
- * @package Core\Http
+ * @package \Core\Http
  */
 class Session
 {
@@ -40,12 +40,12 @@ class Session
      */
     function __construct()
     {
-        $this->name = env('APP_NAME', 'kamu') . '_session';
+        $this->name = (HTTPS ? '__Secure-' : '') . env('APP_NAME', 'kamu') . '_sessid';
         $this->expires = intval(env('COOKIE_LIFETIME', 86400)) + time();
         $this->data = [];
 
         if (@$_COOKIE[$this->name]) {
-            $this->data = unserialize(Hash::decrypt(rawurldecode($_COOKIE[$this->name])));
+            $this->data = @unserialize(Hash::decrypt(rawurldecode($_COOKIE[$this->name])));
         }
 
         if (is_null($this->get('_token'))) {
@@ -102,7 +102,7 @@ class Session
      */
     public function set(string $name, mixed $value): void
     {
-        $this->data[$name] = $value;
+        @$this->data[$name] = $value;
     }
 
     /**

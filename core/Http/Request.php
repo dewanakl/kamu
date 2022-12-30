@@ -10,7 +10,7 @@ use Exception;
  * Request yang masuk
  *
  * @class Request
- * @package Core\Http
+ * @package \Core\Http
  */
 class Request
 {
@@ -99,7 +99,7 @@ class Request
      */
     public function method(): string
     {
-        return $this->server('REQUEST_METHOD');
+        return strtoupper($this->server('REQUEST_METHOD'));
     }
 
     /**
@@ -164,6 +164,8 @@ class Request
      *
      * @param array|Validator $error
      * @return void
+     * 
+     * @throws Exception
      */
     public function throw(array|Validator $error): void
     {

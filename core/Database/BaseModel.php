@@ -16,7 +16,7 @@ use Traversable;
  * Simple query builder
  *
  * @class BaseModel
- * @package Core\Database
+ * @package \Core\Database
  */
 class BaseModel implements Countable, IteratorAggregate, JsonSerializable
 {
@@ -435,16 +435,16 @@ class BaseModel implements Countable, IteratorAggregate, JsonSerializable
      * @param string|array $param
      * @return BaseModel
      */
-    public function select(string|array ...$param): BaseModel
+    public function select(string|array $param): BaseModel
     {
-        if (is_array($param[0])) {
-            $param = $param[0];
+        if (is_array($param)) {
+            $param = implode(', ', $param);
         }
 
         $this->checkSelect();
         $data = explode(' FROM', $this->query);
 
-        $this->query = $data[0] . (str_contains($this->query, 'SELECT *') ? ' ' : ', ') . implode(', ', $param) . ' FROM' . $data[1];
+        $this->query = $data[0] . (str_contains($this->query, 'SELECT *') ? ' ' : ', ') . $param . ' FROM' . $data[1];
         $this->query = str_replace('SELECT *', 'SELECT', $this->query);
 
         return $this;

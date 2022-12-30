@@ -6,7 +6,7 @@ namespace Core\Routing;
  * Helper class untuk routing url
  *
  * @class Route
- * @package Core\Routing
+ * @package \Core\Routing
  */
 final class Route
 {

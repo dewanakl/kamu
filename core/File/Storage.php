@@ -9,7 +9,7 @@ use Core\Http\Stream;
  * Storage manipulation
  *
  * @class Storage
- * @package Core\File
+ * @package \Core\File
  */
 final class Storage
 {

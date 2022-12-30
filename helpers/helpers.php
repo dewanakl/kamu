@@ -138,7 +138,7 @@ if (!function_exists('trace')) {
         clear_ob();
         header('Content-Type: text/html');
         header('HTTP/1.1 500 Internal Server Error', true, 500);
-        respond()->send(render('../helpers/errors/trace', ['error' => $error]));
+        respond()->terminate(render('../helpers/errors/trace', ['error' => $error]));
     }
 }
 
@@ -153,7 +153,7 @@ if (!function_exists('dd')) {
     {
         clear_ob();
         header('Content-Type: text/html');
-        respond()->send(render('../helpers/errors/dd', ['param' => $param]));
+        respond()->terminate(render('../helpers/errors/dd', ['param' => $param]));
     }
 }
 

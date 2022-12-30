@@ -6,7 +6,7 @@ namespace Core\View;
  * Template view dengan parent
  *
  * @class View
- * @package Core\View
+ * @package \Core\View
  */
 class View
 {
@@ -123,11 +123,11 @@ class View
      * Tampilkan bagian dari html
      * 
      * @param string $name
-     * @return string|false|null
+     * @return string|null
      */
-    public function content(string $name): string|false|null
+    public function content(string $name): string|null
     {
-        $content = @$this->section[$name];
+        $content = @$this->section[$name] ?? null;
         $this->section[$name] = null;
 
         return $content;
@@ -141,7 +141,7 @@ class View
      */
     public function endsection(string $name): void
     {
-        $this->section[$name] = ob_get_contents();
+        $this->section[$name] = strval(ob_get_contents());
         ob_end_clean();
     }
 }

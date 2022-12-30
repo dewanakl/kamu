@@ -9,7 +9,7 @@ use Core\View\View;
  * Respond dari request yang masuk
  *
  * @class Respond
- * @package Core\Http
+ * @package \Core\Http
  */
 class Respond
 {
@@ -54,10 +54,10 @@ class Respond
      * Isi dengan pesan
      * 
      * @param string $key
-     * @param string $value
+     * @param mixed $value
      * @return Respond
      */
-    public function with(string $key, string $value): Respond
+    public function with(string $key, mixed $value): Respond
     {
         $this->session->set($key, $value);
         return $this;

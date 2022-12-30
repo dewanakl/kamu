@@ -8,7 +8,7 @@ use Closure;
  * Membuat tabel dengan mudah
  * 
  * @class Table
- * @package Core\Database
+ * @package \Core\Database
  */
 class Table
 {
@@ -78,9 +78,7 @@ class Table
      */
     public function create(): string
     {
-        $query = 'CREATE TABLE IF NOT EXISTS ' . $this->table . ' (';
-        $query .= join(', ', $this->query);
-        $query .= ');';
+        $query = 'CREATE TABLE IF NOT EXISTS ' . $this->table . ' (' . join(', ', $this->query) . ');';
         $this->query = [];
         $this->columns = [];
 

@@ -6,7 +6,7 @@ namespace Core\Facades;
  * Jadi satu objek aplikasi yang bisa digunakan di semua tempat
  *
  * @class App
- * @package Core\Facades
+ * @package \Core\Facades
  */
 final class App
 {

@@ -11,7 +11,7 @@ use Core\View\View;
  * Base controller untuk mempermudah memanggil fungsi
  *
  * @class Controller
- * @package Core\Routing
+ * @package \Core\Routing
  */
 abstract class Controller
 {

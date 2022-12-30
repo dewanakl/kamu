@@ -15,7 +15,7 @@ use ReflectionMethod;
  * inject sebuah object kedalam fungsi
  *
  * @class Application
- * @package Core\Facades
+ * @package \Core\Facades
  */
 class Application
 {
@@ -43,16 +43,26 @@ class Application
      *
      * @param string $name
      * @param array $param
-     * @return object
+     * @return object|null
+     * 
+     * @throws Exception
      */
-    private function getConstructor(string $name, array $param = []): object
+    private function getConstructor(string $name, array $param = []): object|null
     {
-        $reflector = new ReflectionClass($name);
+        $result = null;
 
-        $constructor = $reflector->getConstructor();
-        $args = is_null($constructor) ? null : $constructor->getParameters();
+        try {
+            $reflector = new ReflectionClass($name);
 
-        return $reflector->newInstanceArgs($this->getDependencies($args, $param));
+            $constructor = $reflector->getConstructor();
+            $args = is_null($constructor) ? null : $constructor->getParameters();
+
+            $result = $reflector->newInstanceArgs($this->getDependencies($args, $param));
+        } catch (ReflectionException $e) {
+            throw new Exception($e->getMessage());
+        }
+
+        return $result;
     }
 
     /**

@@ -11,7 +11,7 @@ use Throwable;
  * Hubungkan ke database yang ada dengan pdo
  *
  * @class DataBase
- * @package Core\Database
+ * @package \Core\Database
  */
 class DataBase
 {
@@ -247,9 +247,9 @@ class DataBase
      * Dapatkan idnya
      * 
      * @param mixed $name
-     * @return string|false
+     * @return string|bool
      */
-    public function lastInsertId(mixed $name = null): string|false
+    public function lastInsertId(mixed $name = null): string|bool
     {
         return $this->pdo->lastInsertId($name);
     }

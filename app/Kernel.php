@@ -82,12 +82,11 @@ class Kernel
     /**
      * Dapatkan baseurl
      * 
-     * @param bool $https
      * @return string
      */
-    public function getBaseurl(bool $https): string
+    public function getBaseurl(): string
     {
-        return @$_ENV['BASEURL'] ? rtrim($_ENV['BASEURL'], '/') : ($https ? 'https://' : 'http://') . trim($_SERVER['HTTP_HOST']);
+        return @$_ENV['BASEURL'] ? rtrim($_ENV['BASEURL'], '/') : (HTTPS ? 'https://' : 'http://') . trim($_SERVER['HTTP_HOST']);
     }
 
     /**
@@ -141,17 +140,18 @@ class Kernel
         }
 
         define('HTTPS', static::$self->getHttps());
-        define('BASEURL', static::$self->getBaseurl(HTTPS));
+        define('BASEURL', static::$self->getBaseurl());
         define('DEBUG', @$_ENV['DEBUG'] == 'true');
 
         static::$self->helper();
         static::$self->errorHandler();
+        $app = static::$self->app();
 
         if (!env('APP_KEY')) {
             throw new \Exception('App Key gk ada !');
         }
 
-        return static::$self->app();
+        return $app;
     }
 
     /**
