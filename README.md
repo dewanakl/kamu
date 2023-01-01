@@ -9,7 +9,7 @@ Dibantu dengan saya console untuk mempermudah dalam development aplikasi kamu.
 ## Get Started Project
 - Clone or download this repository
     ```bash
-    git clone https://github.com/dewanakl/DikitLink.git
+    git clone https://github.com/dewanakl/Kamu.git
     ```
 - Create .env file
     ```bash
