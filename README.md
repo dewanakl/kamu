@@ -1,25 +1,28 @@
+<p align="center"><img src="public/kamu.png" width="200" alt="kamu"></p>
+
 ## About Kamu
 
-Kamu adalah PHP framework yang sangat sederhana. Saking sederhananya, serasa di localhost !!! \
-Dibantu dengan saya console untuk mempermudah dalam develop aplikasi kamu.
+Kamu adalah PHP framework yang sangat sederhana. Saking sederhananya, serasa di localhost !!!
+<br>
+Dibantu dengan saya console untuk mempermudah dalam development aplikasi kamu.
 
-> Intinya mirip dengan laravel, karena terinspirasi darinya
-
-## How to run ?
-- `clone or download this repository`
-- `cp .env.example .env`
-- `php saya key`
-- `php saya coba`
-
-> Simple bukan ? hehee
-
-## Todo list
-
-- [ ] Security check
-
-## Warning
-
-Kamu framework is for educational purposes only but ready for production 
+## Get Started Project
+- Clone or download this repository
+    ```bash
+    git clone https://github.com/dewanakl/DikitLink.git
+    ```
+- Create .env file
+    ```bash
+    cp .env.example .env
+    ```
+- Create key application
+    ```bash
+    php saya key
+    ```
+- Run in development server
+    ```bash
+    php saya coba
+    ```
 
 ## License
 
