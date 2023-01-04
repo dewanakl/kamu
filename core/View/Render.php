@@ -2,8 +2,6 @@
 
 namespace Core\View;
 
-use InvalidArgumentException;
-
 /**
  * Tampilkan html dan juga injek variabel
  *
@@ -38,16 +36,10 @@ class Render
      * 
      * @param string $path
      * @return void
-     * 
-     * @throws InvalidArgumentException
      */
     function __construct(string $path)
     {
         $this->path = __DIR__ . '/../../views/' . $path . '.php';
-
-        if (!file_exists($this->path)) {
-            throw new InvalidArgumentException(sprintf('File "%s" gk adaa', $path . '.php'));
-        }
     }
 
     /**
@@ -88,7 +80,7 @@ class Render
             ob_start();
             extract($__data, EXTR_SKIP);
 
-            include_once $__path;
+            require_once $__path;
             $content = ob_get_contents();
 
             ob_end_clean();

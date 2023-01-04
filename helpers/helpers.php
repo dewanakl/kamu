@@ -335,10 +335,11 @@ if (!function_exists('route')) {
     {
         $regex = '([\w-]*)';
         $param = getPathFromRoute($param);
+        $lenregex = strlen($regex);
 
         foreach ($keys as $key) {
             $pos = strpos($param, $regex);
-            $param = ($pos !== false) ? substr_replace($param, strval($key), $pos, strlen($regex)) : $param;
+            $param = ($pos !== false) ? substr_replace($param, strval($key), $pos, $lenregex) : $param;
         }
 
         if (str_contains($param, $regex)) {
@@ -379,7 +380,7 @@ if (!function_exists('error')) {
             return $error;
         }
 
-        $result = @$error[$key];
+        $result = @$error[$key] ?? null;
 
         if ($result && $optional) {
             return $optional;
@@ -476,9 +477,9 @@ if (!function_exists('content')) {
      * Tampilkan bagian dari html
      * 
      * @param string $name
-     * @return string|false|null
+     * @return string|null
      */
-    function content(string $name): string|false|null
+    function content(string $name): string|null
     {
         return app(View::class)->content($name);
     }

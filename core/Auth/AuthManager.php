@@ -135,7 +135,7 @@ class AuthManager
         }
 
         $this->session->set('old', [$first => $credential[$first]]);
-        $this->session->set('error', [$first => "$first atau $last salah !"]);
+        $this->session->set('error', [$first => $first . ' atau ' . $last . ' salah !']);
         return false;
     }
 }

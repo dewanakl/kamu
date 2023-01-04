@@ -73,7 +73,7 @@ class Validator
     {
         switch (true) {
             case $rule == 'required':
-                if (!$this->__isset($param) || empty(trim(strval($value)))) {
+                if (!$this->__isset($param) || empty(trim(strval($value ?? '')))) {
                     $this->setError($param, 'dibutuhkan !');
                 }
                 break;
@@ -127,6 +127,12 @@ class Validator
 
             case $rule == 'slug':
                 $this->__set($param, preg_replace('/[^\w-]/', '', $value));
+                break;
+
+            case $rule == 'safe':
+                $bad = array_merge(array_map('chr', range(0, 31)), ['\\', '/', ':', '*', '?', '"', '<', '>', '|']);
+                $filename = str_replace($bad, '', $value);
+                $this->__set($param, $filename);
                 break;
 
             case $rule == 'hash':

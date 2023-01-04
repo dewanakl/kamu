@@ -36,7 +36,7 @@ final class Hash
         $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length(self::CIPHERING));
         $encrypted = openssl_encrypt($str, self::CIPHERING, $app[1] ?? static::rand(5), OPENSSL_RAW_DATA, $iv);
 
-        return base64_encode($iv . hash_hmac(self::HASH, $encrypted, $app[0], true) . $encrypted);
+        return base64_encode($iv . hash_hmac(self::HASH, $encrypted, $app[0] ?? static::rand(5), true) . $encrypted);
     }
 
     /**
@@ -53,7 +53,7 @@ final class Hash
         $iv = openssl_cipher_iv_length(self::CIPHERING);
         $encrypted = substr($mix, $iv + 64);
 
-        if (!hash_equals(substr($mix, $iv, 64), hash_hmac(self::HASH, $encrypted, $app[0], true))) {
+        if (!hash_equals(substr($mix, $iv, 64), hash_hmac(self::HASH, $encrypted, $app[0] ?? static::rand(5), true))) {
             return null;
         }
 

@@ -83,10 +83,10 @@ class Stream
             notFound();
         }
 
-        $timeFile = filemtime($file);
-        $hashFile = md5($file);
+        $timeFile = @filemtime($file);
+        $hashFile = @md5($file);
 
-        if (strtotime($this->request->server('HTTP_IF_MODIFIED_SINCE')) == $timeFile || trim($this->request->server('HTTP_IF_NONE_MATCH')) == $hashFile) {
+        if (@strtotime($this->request->server('HTTP_IF_MODIFIED_SINCE', '')) == $timeFile || @trim($this->request->server('HTTP_IF_NONE_MATCH', '')) == $hashFile) {
             http_response_code(304);
             header('HTTP/1.1 304 Not Modified', true, 304);
             exit;
@@ -96,10 +96,10 @@ class Stream
         header('Etag: ' . $hashFile);
 
         set_time_limit(0);
-        $this->file = fopen($file, 'r');
-        $this->name = basename($file);
+        $this->file = @fopen($file, 'r');
+        $this->name = @basename($file);
         $this->boundary = $hashFile;
-        $this->size = filesize($file);
+        $this->size = @filesize($file);
         $this->type = $this->ftype($file);
         $this->download = false;
     }
@@ -112,10 +112,9 @@ class Stream
      */
     private function pushSingle(string $range): void
     {
-        $start = $end = 0;
-        $this->getRange($range, $start, $end);
+        list($start, $end) = $this->getRange($range);
 
-        header('Content-Length: ' . ($end - $start + 1));
+        header('Content-Length: ' . strval($end - $start + 1));
         header(sprintf('Content-Range: bytes %d-%d/%d', $start, $end, $this->size));
 
         fseek($this->file, $start);
@@ -136,7 +135,7 @@ class Stream
         $formatRange = "Content-Range: bytes %d-%d/%d\r\n\r\n";
 
         foreach ($ranges as $range) {
-            $this->getRange($range, $start, $end);
+            list($start, $end) = $this->getRange($range);
             $length += strlen("\r\n--" . $this->boundary . "\r\n");
             $length += strlen($tl);
             $length += strlen(sprintf($formatRange, $start, $end, $this->size));
@@ -146,10 +145,10 @@ class Stream
         $length += strlen("\r\n--" . $this->boundary . "--\r\n");
 
         header('Content-Type: multipart/byteranges; boundary=' . $this->boundary);
-        header('Content-Length: ' . $length);
+        header('Content-Length: ' . strval($length));
 
         foreach ($ranges as $range) {
-            $this->getRange($range, $start, $end);
+            list($start, $end) = $this->getRange($range);
             echo "\r\n--" . $this->boundary . "\r\n";
             echo $tl;
             echo sprintf($formatRange, $start, $end, $this->size);
@@ -164,33 +163,36 @@ class Stream
      * Get range file
      * 
      * @param string $range
-     * @param int &$start
-     * @param int &$end
-     * @return void
+     * @return array
      */
-    private function getRange(string $range, int &$start, int &$end): void
+    private function getRange(string $range): array
     {
         list($start, $end) = explode('-', $range);
         $fileSize = $this->size;
 
         if ($start == '') {
-            $tmp = $end;
+            $tmp = intval($end);
             $end = $fileSize - 1;
             $start = $fileSize - $tmp;
             if ($start < 0) {
                 $start = 0;
             }
         } else {
-            if ($end == '' || $end > $fileSize - 1) {
+            if (strval($end) == '' || intval($end) > ($fileSize - 1)) {
                 $end = $fileSize - 1;
             }
         }
 
+        $start = intval($start);
+        $end = intval($end);
+
         if ($start > $end) {
             header('Status: 416 Requested Range Not Satisfiable');
-            header('Content-Range: */' . $fileSize);
+            header('Content-Range: */' . strval($fileSize));
             exit;
         }
+
+        return [$start, $end];
     }
 
     /**
@@ -294,7 +296,7 @@ class Stream
             header('HTTP/1.1 206 Partial Content', true, 206);
             ($t === 1) ? $this->pushSingle($range) : $this->pushMulti($ranges);
         } else {
-            header('Content-Length: ' . $this->size);
+            header('Content-Length: ' . strval($this->size));
             $this->readFile();
         }
 

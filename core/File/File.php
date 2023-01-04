@@ -143,6 +143,7 @@ class File
             }
             fclose($out);
         } else {
+            fclose($out);
             return false;
         }
 

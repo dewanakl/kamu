@@ -46,6 +46,7 @@ class View
     function __toString()
     {
         $content = strval($this->content);
+        clear_ob();
 
         $this->section = [];
         $this->variables = [];

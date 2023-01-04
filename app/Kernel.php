@@ -27,13 +27,18 @@ class Kernel
      * Init object
      * 
      * @return void
+     * @throws Exception
      */
     function __construct()
     {
         $this->loader();
         $this->app = new \Core\Facades\Application();
         $this->setEnv();
-        date_default_timezone_set(@$_ENV['TIMEZONE'] ?? 'Asia/Jakarta');
+        $dt = date_default_timezone_set(@$_ENV['TIMEZONE'] ?? 'Asia/Jakarta');
+
+        if (!$dt) {
+            throw new \Exception('Date time invalid !');
+        }
     }
 
     /**
@@ -76,7 +81,7 @@ class Kernel
      */
     public function getHttps(): bool
     {
-        return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443 || @$_ENV['HTTPS'] == 'true';
+        return (!empty(@$_SERVER['HTTPS']) && @$_SERVER['HTTPS'] != 'off') || @$_SERVER['SERVER_PORT'] == '443' || @$_ENV['HTTPS'] == 'true';
     }
 
     /**
