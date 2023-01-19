@@ -34,7 +34,7 @@ final class Kernel
     /**
      * Registrasi service agar bisa dijalankan.
      *
-     * @return array<class-string>
+     * @return array
      */
     public function services(): array
     {
@@ -47,7 +47,7 @@ final class Kernel
     /**
      * Kumpulan middleware yang dijalankan lebih awal.
      *
-     * @return array<class-string>
+     * @return array
      */
     public function middlewares(): array
     {
