@@ -1,9 +1,9 @@
 <p align="center"><img src="https://raw.githubusercontent.com/dewanakl/Kamu/main/public/kamu.png" width="200" alt="kamu"></p>
 
 <p align="center">
-<a href="https://packagist.org/packages/kamu/kamu"><img src="https://img.shields.io/packagist/dt/kamu/kamu" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/kamu/kamu"><img src="https://img.shields.io/packagist/v/kamu/kamu" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/kamu/kamu"><img src="https://img.shields.io/packagist/l/kamu/kamu" alt="License"></a>
+<a href="https://packagist.org/packages/kamu/framework"><img src="https://img.shields.io/packagist/dt/kamu/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/kamu/framework"><img src="https://img.shields.io/packagist/v/kamu/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/kamu/framework"><img src="https://img.shields.io/packagist/l/kamu/framework" alt="License"></a>
 </p>
 
 ## About Kamu
