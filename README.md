@@ -28,7 +28,7 @@ Dibantu dengan saya console untuk mempermudah dalam development aplikasi Anda.
 
 ## Contributing
 
-I'm very open to those of you who want to contribute to your framework!
+I'm very open to those of you who want to contribute to Kamu framework!
 
 ## Security Vulnerabilities
 
