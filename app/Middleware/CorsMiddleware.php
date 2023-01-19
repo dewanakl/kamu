@@ -1,6 +1,6 @@
 <?php
 
-namespace Middleware;
+namespace App\Middleware;
 
 use Closure;
 use Core\Http\Request;
@@ -14,7 +14,7 @@ final class CorsMiddleware implements MiddlewareInterface
         header('X-XSS-Protection: 1; mode=block');
         header('X-Frame-Options: SAMEORIGIN');
 
-        if (HTTPS) {
+        if (https()) {
             header('Referrer-Policy: strict-origin-when-cross-origin');
             header('Permissions-Policy: geolocation=()');
             header('Content-Security-Policy: upgrade-insecure-requests');

@@ -1,6 +1,6 @@
 <?php
 
-namespace Controllers;
+namespace App\Controllers;
 
 use Core\Routing\Controller;
 use Core\Http\Request;

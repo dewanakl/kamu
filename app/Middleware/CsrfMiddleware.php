@@ -1,6 +1,6 @@
 <?php
 
-namespace Middleware;
+namespace App\Middleware;
 
 use Closure;
 use Core\Http\Request;

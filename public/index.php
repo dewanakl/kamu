@@ -1,16 +1,19 @@
 <?php
 
-define('START_TIME', microtime(true));
-
-require_once __DIR__ . '/../app/Kernel.php';
-
-/** 
- * Create this web application kernel then
- * Create a service object and run it
+/**
+ * Import semua class yang digunakan dalam framework ini.
+ * Tenang, ini telah otomatis oleh composer.
  * 
- * it's simple
+ * Sekarang, tinggal menjalankan aplikasi ini. 
  */
 
-Kernel::web()
-    ->make(\Core\Facades\Service::class)
-    ->run();
+require_once __DIR__ . '/../vendor/autoload.php';
+
+/**
+ * Okey, sekarang memanggil fungsi web secara static.
+ * Setelah ini, hanya perlu menjalankannya.
+ * 
+ * Ini sangat mudah.
+ */
+
+exit(Core\Facades\Kernel::web()->run());

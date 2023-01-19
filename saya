@@ -1,17 +1,20 @@
 #!/usr/bin/env php
 <?php
 
-define('START_TIME', microtime(true));
-
-require_once 'app/Kernel.php';
-
 /**
- * Create this console application kernel then
- * Create console object and run
+ * Import semua class yang digunakan dalam framework ini.
+ * Tenang, ini telah otomatis oleh composer.
  * 
- * it's simple
+ * Sekarang, tinggal menjalankan aplikasi ini. 
  */
 
-exit(Kernel::console()
-    ->make(\Core\Support\Console::class, array($argv))
-    ->run());
+require_once __DIR__ . '/vendor/autoload.php';
+
+/**
+ * Okey, sekarang memanggil fungsi console secara static.
+ * Setelah ini, hanya perlu menjalankannya.
+ * 
+ * Ini sangat mudah.
+ */
+
+exit(Core\Facades\Kernel::console()->run());

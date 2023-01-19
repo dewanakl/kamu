@@ -1,8 +1,8 @@
 <?php
 
-namespace Models;
+namespace App\Models;
 
-use Core\Database\Model;
+use Core\Model\Model;
 
 final class User extends Model
 {

@@ -1,6 +1,6 @@
 <?php
 
-use Controllers\WelcomeController;
+use App\Controllers\WelcomeController;
 use Core\Routing\Route;
 
 /**

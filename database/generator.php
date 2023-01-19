@@ -1,7 +1,7 @@
 <?php
 
 use Core\Database\Generator;
-use Models\User;
+use App\Models\User;
 
 return new class implements Generator
 {
@@ -13,9 +13,9 @@ return new class implements Generator
     public function run()
     {
         User::create([
-            'nama' => 'admin',
-            'email' => 'admin@admin.com',
-            'password' => password_hash('admin123', PASSWORD_BCRYPT)
+            'nama' => 'User',
+            'email' => 'user@example.com',
+            'password' => password_hash('12345678', PASSWORD_BCRYPT)
         ]);
     }
 };
