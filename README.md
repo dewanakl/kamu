@@ -13,7 +13,7 @@ Kamu adalah PHP framework yang sangat sederhana. Saking sederhananya, serasa di 
 Dibantu dengan saya console untuk mempermudah dalam development aplikasi Anda.
 
 ## Get Started Project
-- Clone or download this repository
+- Create a project with composer
     ```bash
     composer create-project kamu/kamu coba-app
     ```
