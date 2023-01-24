@@ -2,6 +2,7 @@
 
 use Core\Database\Generator;
 use App\Models\User;
+use Core\Valid\Hash;
 
 return new class implements Generator
 {
@@ -15,7 +16,7 @@ return new class implements Generator
         User::create([
             'nama' => 'User',
             'email' => 'user@example.com',
-            'password' => password_hash('12345678', PASSWORD_BCRYPT)
+            'password' => Hash::make('12345678')
         ]);
     }
 };
