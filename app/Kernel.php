@@ -53,6 +53,7 @@ final class Kernel
     {
         return [
             \App\Middleware\CorsMiddleware::class,
+            \App\Middleware\XSSMiddleware::class,
             \App\Middleware\CsrfMiddleware::class
         ];
     }
