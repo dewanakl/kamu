@@ -10,6 +10,10 @@ final class XSSMiddleware implements MiddlewareInterface
 {
     public function handle(Request $request, Closure $next)
     {
+        if (!https()) {
+            return $next($request);
+        }
+
         header('Referrer-Policy: strict-origin-when-cross-origin');
         header('Content-Security-Policy: upgrade-insecure-requests');
 
