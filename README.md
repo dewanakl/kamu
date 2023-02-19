@@ -2,6 +2,7 @@
 
 <p align="center">
 <a href="https://packagist.org/packages/kamu/framework"><img src="https://img.shields.io/packagist/dt/kamu/framework" alt="Total Downloads"></a>
+<a href="https://github.com/dewanakl/framework"><img src="https://img.shields.io/github/repo-size/dewanakl/framework" alt="repo size"></a>
 <a href="https://packagist.org/packages/kamu/framework"><img src="https://img.shields.io/packagist/v/kamu/framework" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/kamu/framework"><img src="https://img.shields.io/packagist/l/kamu/framework" alt="License"></a>
 </p>
