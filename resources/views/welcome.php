@@ -16,8 +16,8 @@
 <body class="font-sans m-0 bg-gradient-to-br from-indigo-300 to-purple-400">
     <div class="flex h-screen justify-center items-center">
         <div class="text-slate-600 text-center bg-white p-8 rounded-xl drop-shadow-2xl">
-            <h1 class="inline font-medium text-4xl">Kamu |</h1>
-            <p class="inline font-medium text-2xl ml-2"><?= e($data) ?></p>
+            <h1 class="inline font-medium text-4xl">Kamu</h1>
+            <p class="inline font-medium text-2xl"><?= e($data) ?></p>
             <small class="block mt-4" id="information"></small>
         </div>
     </div>
