@@ -12,7 +12,7 @@ final class Kernel
     private $path;
 
     /**
-     * Init object
+     * Init object.
      * 
      * @return void
      */
