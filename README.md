@@ -29,11 +29,11 @@ Dibantu dengan saya console untuk mempermudah dalam development aplikasi Anda.
 
 ## Contributing
 
-I'm very open to those of you who want to contribute to Kamu framework!
+I'm very open to those of you who want to contribute to the Kamu framework!
 
 ## Security Vulnerabilities
 
-If you find a security vulnerability in this Kamu, please email DKL via [dewanakretarta29@gmail.com](mailto:dewanakretarta29@gmail.com).
+If you find any security vulnerabilities in this Kamu framework, please email DKL via [dewanakretarta29@gmail.com](mailto:dewanakretarta29@gmail.com).
 
 ## License
 

@@ -7,7 +7,7 @@ use Core\Valid\Hash;
 return new class implements Generator
 {
     /**
-     * Generate nilai database
+     * Generate nilai database.
      *
      * @return void
      */

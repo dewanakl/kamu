@@ -7,7 +7,7 @@ use Core\Database\Table;
 return new class implements Migration
 {
     /**
-     * Jalankan migrasi
+     * Jalankan migrasi.
      *
      * @return void
      */
@@ -25,7 +25,7 @@ return new class implements Migration
     }
 
     /**
-     * Kembalikan seperti semula
+     * Kembalikan seperti semula.
      *
      * @return void
      */
