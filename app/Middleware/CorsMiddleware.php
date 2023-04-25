@@ -15,7 +15,7 @@ final class CorsMiddleware implements MiddlewareInterface
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
         header('Access-Control-Allow-Headers: Origin, Content-Type, Accept, Authorization, Token');
         header('Origin: ' . baseurl());
-        header('Vary: Accept-Encoding, Origin');
+        header('Vary: Accept-Encoding, Origin, User-Agent');
 
         if ($request->method() != 'OPTIONS') {
             return $next($request);
