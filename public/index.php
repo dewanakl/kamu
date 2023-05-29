@@ -1,5 +1,7 @@
 <?php
 
+define('KAMU_START', microtime(true));
+
 /**
  * Import semua class yang digunakan dalam framework ini.
  * Tenang, ini telah otomatis oleh composer.
