@@ -14,12 +14,11 @@ final class XSSMiddleware implements MiddlewareInterface
             return $next($request);
         }
 
-        header('Referrer-Policy: strict-origin-when-cross-origin');
-        header('Content-Security-Policy: upgrade-insecure-requests');
-
-        header('X-Content-Type-Options: nosniff');
-        header('X-XSS-Protection: 1; mode=block');
-        header('X-Frame-Options: SAMEORIGIN');
+        respond()->getHeader()->set('Referrer-Policy', 'strict-origin-when-cross-origin')
+            ->set('Content-Security-Policy', 'upgrade-insecure-requests')
+            ->set('X-Content-Type-Options', 'nosniff')
+            ->set('X-XSS-Protection', '1; mode=block')
+            ->set('X-Frame-Options', 'SAMEORIGIN');
 
         return $next($request);
     }

@@ -3,6 +3,7 @@
 namespace App\Middleware;
 
 use Closure;
+use Core\Auth\Auth;
 use Core\Http\Request;
 use Core\Middleware\MiddlewareInterface;
 
@@ -10,10 +11,10 @@ final class AuthMiddleware implements MiddlewareInterface
 {
     public function handle(Request $request, Closure $next)
     {
-        if (auth()->check()) {
+        if (Auth::check()) {
             return $next($request);
         }
 
-        respond()->redirect('/login');
+        return respond()->to('/login');
     }
 }

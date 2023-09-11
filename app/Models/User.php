@@ -10,6 +10,14 @@ final class User extends Model
 
     protected $primaryKey = 'id';
 
+    protected $typeKey = 'int';
+
+    protected $fillable = [
+        'nama',
+        'email',
+        'password'
+    ];
+
     protected $dates = [
         'created_at',
         'updated_at',
