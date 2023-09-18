@@ -11,3 +11,5 @@ npm-debug.log
 yarn-error.log
 .idea
 .vscode
+CODE_OF_CONDUCT.md
+SECURITY.md
