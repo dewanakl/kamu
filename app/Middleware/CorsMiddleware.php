@@ -16,7 +16,10 @@ final class CorsMiddleware implements MiddlewareInterface
 
         $header = respond()->getHeader();
         $header->set('Access-Control-Allow-Origin', '*');
-        $header->set('Vary', 'Accept, Accept-Encoding, Access-Control-Request-Method, Access-Control-Request-Headers, Origin, User-Agent');
+        $header->set(
+            'Vary',
+            'Accept, Accept-Encoding, Access-Control-Request-Method, Access-Control-Request-Headers, Origin, User-Agent'
+        );
 
         if (!$request->method(Request::OPTIONS)) {
             return $next($request);
