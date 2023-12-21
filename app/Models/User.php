@@ -24,7 +24,7 @@ final class User extends Model
         'updated_at',
     ];
 
-    protected function fakes()
+    protected function fakes(): array
     {
         return [
             'nama' => fake()->name(),
