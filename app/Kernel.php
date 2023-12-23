@@ -73,6 +73,7 @@ final class Kernel implements KernelContract
         return [
             \App\Providers\AppServiceProvider::class,
             \App\Providers\RouteServiceProvider::class,
+            \App\Providers\EventServiceProvider::class,
             \App\Providers\TranslatorServiceProvide::class,
         ];
     }
