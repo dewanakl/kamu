@@ -4,16 +4,21 @@ namespace App\Middleware;
 
 use Closure;
 use Core\Http\Request;
+use Core\Http\Respond;
 use Core\Http\Stream;
 use Core\Middleware\MiddlewareInterface;
 
 final class GzipMiddleware implements MiddlewareInterface
 {
-    public function handle(Request $request, Closure $next): Stream|\Core\Http\Respond
+    public function handle(Request $request, Closure $next): Stream|Respond
     {
         $response = $next($request);
 
         if ($response instanceof Stream) {
+            return $response;
+        }
+
+        if ($response instanceof Respond && $response->getCode() < 400 && $response->getCode() >= 300) {
             return $response;
         }
 
