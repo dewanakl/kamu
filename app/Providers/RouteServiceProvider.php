@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Middleware\CsrfMiddleware;
 use Core\Facades\Provider;
 use Core\Routing\Route;
 use Core\Routing\Router;
@@ -16,6 +17,11 @@ class RouteServiceProvider extends Provider
     public function booting()
     {
         $this->app->singleton(Router::class);
-        Route::setRouteFromCacheIfExist();
+
+        if (!Route::setRouteFromCacheIfExist()) {
+            Route::middleware(CsrfMiddleware::class)->group(function () {
+                Route::setRouteFromFile();
+            });
+        }
     }
 }

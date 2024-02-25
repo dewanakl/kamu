@@ -28,11 +28,11 @@ final class GzipMiddleware implements MiddlewareInterface
             return $response;
         }
 
-        if (!str_contains($request->server->get('HTTP_ACCEPT_ENCODING'), 'gzip')) {
+        if (!str_contains($request->server->get('HTTP_ACCEPT_ENCODING', ''), 'gzip')) {
             return $response;
         }
 
-        $compressed = gzencode($response->getContent(false), 1);
+        $compressed = gzencode($response->getContent(false), 3);
 
         if ($compressed === false) {
             return $response;
@@ -40,7 +40,7 @@ final class GzipMiddleware implements MiddlewareInterface
 
         $response->setContent($compressed);
 
-        $vary = (!$response->headers->has('Vary')) ? [] : explode(', ', $response->headers->get('Vary'));
+        $vary = $response->headers->has('Vary') ? explode(', ', $response->headers->get('Vary')) : [];
         $vary = array_unique([...$vary, 'Accept-Encoding']);
 
         $response->headers
