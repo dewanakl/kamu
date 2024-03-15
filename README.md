@@ -10,9 +10,7 @@
 
 ## About Kamu
 
-Kamu adalah PHP framework yang sangat sederhana. Saking sederhananya, serasa di localhost!!.
-<br>
-Dibantu dengan saya console untuk mempermudah dalam development aplikasi Anda.
+"Kamu" merupakan PHP framework yang sangat simpel, memberikan pengalaman seolah-olah berada di localhost meskipun dalam mode production. Dibantu dengan "Saya" konsol yang membantu pengembangan aplikasi secara efisien.
 
 ## Get Started Project
 - Create a project with composer
