@@ -1,11 +1,11 @@
 <p align="center"><img src="https://raw.githubusercontent.com/dewanakl/Kamu/main/public/kamu.png" width="200" alt="kamu"></p>
 
 <p align="center">
-<a href="https://php.net"><img src="https://img.shields.io/packagist/dependency-v/kamu/framework/php.svg?color=birghtgreen" alt="PHP Programming Language"></a>
-<a href="https://packagist.org/packages/kamu/framework"><img src="https://img.shields.io/packagist/dt/kamu/framework?color=birghtgreen" alt="Total Downloads"></a>
-<a href="https://github.com/dewanakl/framework"><img src="https://img.shields.io/github/repo-size/dewanakl/framework?color=birghtgreen" alt="repo size"></a>
-<a href="https://packagist.org/packages/kamu/framework"><img src="https://img.shields.io/packagist/v/kamu/framework?color=birghtgreen" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/kamu/framework"><img src="https://img.shields.io/packagist/l/kamu/framework?color=birghtgreen" alt="License"></a>
+<a href="https://php.net"><img src="https://img.shields.io/packagist/dependency-v/kamu/framework/php.svg?color=brightgreen" alt="PHP Programming Language"></a>
+<a href="https://packagist.org/packages/kamu/framework"><img src="https://img.shields.io/packagist/dt/kamu/framework?color=brightgreen" alt="Total Downloads"></a>
+<a href="https://github.com/dewanakl/framework"><img src="https://img.shields.io/github/repo-size/dewanakl/framework?color=brightgreen" alt="repo size"></a>
+<a href="https://packagist.org/packages/kamu/framework"><img src="https://img.shields.io/packagist/v/kamu/framework?color=brightgreen" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/kamu/framework"><img src="https://img.shields.io/packagist/l/kamu/framework?color=brightgreen" alt="License"></a>
 </p>
 
 ## 📖 About Kamu
