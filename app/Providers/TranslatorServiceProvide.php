@@ -7,6 +7,8 @@ use Core\Valid\Trans;
 
 class TranslatorServiceProvide extends Provider
 {
+    private array $allowedLanguages = ['id', 'en'];
+
     /**
      * Jalankan sewaktu aplikasi dinyalakan.
      *
@@ -14,6 +16,12 @@ class TranslatorServiceProvide extends Provider
      */
     public function booting()
     {
-        Trans::setLanguage('id');
+        $requestLang = strtolower(request()->get('lang', 'id'));
+
+        if (!in_array($requestLang, $this->allowedLanguages, true)) {
+            $requestLang = 'id';
+        }
+
+        Trans::setLanguage($requestLang);
     }
 }

@@ -59,6 +59,7 @@ final class Kernel implements KernelContract
             \App\Middleware\CorsMiddleware::class,
             \App\Middleware\XSSMiddleware::class,
             \App\Middleware\GzipMiddleware::class,
+            \App\Middleware\IpUserAgentMiddleware::class,
         ];
     }
 
