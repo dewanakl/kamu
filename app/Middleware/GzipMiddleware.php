@@ -7,14 +7,15 @@ use Core\Http\Request;
 use Core\Http\Respond;
 use Core\Http\Stream;
 use Core\Middleware\MiddlewareInterface;
+use Generator;
 
 final class GzipMiddleware implements MiddlewareInterface
 {
-    public function handle(Request $request, Closure $next): Stream|Respond
+    public function handle(Request $request, Closure $next): Stream|Respond|Generator
     {
         $response = $next($request);
 
-        if ($response instanceof Stream) {
+        if ($response instanceof Stream || $response instanceof Generator) {
             return $response;
         }
 
@@ -32,7 +33,11 @@ final class GzipMiddleware implements MiddlewareInterface
             return $response;
         }
 
-        $compressed = gzencode($response->getContent(false), 3);
+        if (!$response->getContent()) {
+            return $response;
+        }
+
+        $compressed = gzencode($response->getContent(), 3);
 
         if ($compressed === false) {
             return $response;
